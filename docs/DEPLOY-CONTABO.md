@@ -209,7 +209,7 @@ Look for **`SMTP environment variables are not configured`**, **`smtp: sendMail 
 
 | What you see | What to check |
 |----------------|---------------|
-| Browser error after submit | DevTools → **Network** → POST **`/api/contact`** (or **`/api/complaints`**, **`/api/loan-application`**) → **status** (400 = validation, 500 = SMTP, 404 = proxy/app) and **response JSON**. |
+| Browser error after submit | DevTools → **Network** → POST **`/api/contact`** (or **`/api/complaints`**, **`/api/loan-application`**) → **status** (400 = validation, 500 = SMTP, 404 = proxy/app) and **response JSON**. If JSON includes **`code`**: **`MAIL_SMTP_NOT_CONFIGURED`** = missing/empty **`SMTP_HOST` / `SMTP_USER` / `SMTP_PASS`** on the server (or use **`.env.local`** for **`next dev`**); **`MAIL_SEND_FAILED`** = provider rejected send — use **`journalctl`** for **`smtp: sendMail failed`** (`responseCode`, e.g. auth/TLS). |
 | Success in UI but no email | Spam folder; you are watching the mailbox set in **`CONTACT_TO`** (or **`COMPLAINTS_TO`** / **`LOAN_APPLICATION_TO`**). Logs show **`smtp: message accepted`** → provider accepted delivery; trace in Zoho. |
 | Spinner / no response | Network tab: failed or pending request; Nginx/SSL. |
 

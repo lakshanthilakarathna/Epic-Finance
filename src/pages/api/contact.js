@@ -44,7 +44,10 @@ export default async function handler(req, res) {
   const smtpCtx = getSmtpContext();
   if (!smtpCtx) {
     console.error("contact api: SMTP environment variables are not configured");
-    return res.status(500).json({ error: "Unable to send message. Please try again later." });
+    return res.status(500).json({
+      error: "Unable to send message. Please try again later.",
+      code: "MAIL_SMTP_NOT_CONFIGURED",
+    });
   }
 
   const to = smtpCtx.defaultTo;
@@ -71,6 +74,9 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error("contact api: sendMail failed", e?.message || e);
-    return res.status(500).json({ error: "Unable to send message. Please try again later." });
+    return res.status(500).json({
+      error: "Unable to send message. Please try again later.",
+      code: "MAIL_SEND_FAILED",
+    });
   }
 }

@@ -20,13 +20,15 @@ export async function postFormJson(url, payload) {
   }
   if (!res.ok) {
     const fromApi = typeof body.error === "string" && body.error.trim();
+    const errCode =
+      typeof body.code === "string" && body.code.trim() ? body.code.trim() : "";
     if (fromApi) {
-      throw new Error(fromApi);
+      throw new Error(errCode ? `${fromApi} (${errCode})` : fromApi);
     }
     if (res.status >= 500) {
-      throw new Error(
-        "Server error. Please try again later or email us directly."
-      );
+      const base =
+        "Server error. Please try again later or email us directly.";
+      throw new Error(errCode ? `${base} (${errCode})` : base);
     }
     throw new Error("Something went wrong. Please try again.");
   }

@@ -82,7 +82,10 @@ export default async function handler(req, res) {
 
   if (!getSmtpContext()) {
     console.error("loan-application api: SMTP environment variables are not configured");
-    return res.status(500).json({ error: "Unable to send application. Please try again later." });
+    return res.status(500).json({
+      error: "Unable to send application. Please try again later.",
+      code: "MAIL_SMTP_NOT_CONFIGURED",
+    });
   }
 
   const to = resolveMailTo(
@@ -106,6 +109,9 @@ export default async function handler(req, res) {
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error("loan-application api: sendMail failed", e?.message || e);
-    return res.status(500).json({ error: "Unable to send application. Please try again later." });
+    return res.status(500).json({
+      error: "Unable to send application. Please try again later.",
+      code: "MAIL_SEND_FAILED",
+    });
   }
 }
