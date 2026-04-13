@@ -1,4 +1,13 @@
+import { loadEnvConfig } from "@next/env";
 import nodemailer from "nodemailer";
+
+let envLoaded = false;
+
+function ensureProductionEnv() {
+  if (envLoaded) return;
+  loadEnvConfig(process.cwd());
+  envLoaded = true;
+}
 
 function createSmtpTransport(host, port, user, pass) {
   let secure;
@@ -33,6 +42,7 @@ export function resolveMailTo(...values) {
  * @returns {{ transporter: import('nodemailer').Transporter; user: string; defaultTo: string } | null}
  */
 export function getSmtpContext() {
+  ensureProductionEnv();
   const host = String(process.env.SMTP_HOST ?? "").trim();
   const port = Number(process.env.SMTP_PORT || 465);
   const user = String(process.env.SMTP_USER ?? "").trim();

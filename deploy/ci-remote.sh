@@ -16,6 +16,11 @@ else
 fi
 
 cd "$REMOTE_APP"
+
+if [ ! -f .env.production ]; then
+  echo "WARNING: Missing $REMOTE_APP/.env.production — /api/contact (and other mail APIs) will return MAIL_SMTP_NOT_CONFIGURED until you add SMTP_HOST, SMTP_USER, and SMTP_PASS. Copy deploy/epicfinance.env.example, edit on the server (never commit secrets), then: sudo systemctl restart epicfinance-nextjs"
+fi
+
 "$NPM" ci
 "$NPM" run build
 if [ ! -f .next/BUILD_ID ]; then

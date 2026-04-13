@@ -244,6 +244,8 @@ The **Deploy to Contabo** workflow runs **`npm ci`** and **`npm run build`** on 
 
 The site sends **contact**, **complaints**, and **loan application** submissions through **`/api/contact`**, **`/api/complaints`**, and **`/api/loan-application`** (same **`next start`** process). All need **`SMTP_*`** in **`.env.production`**. Optional: **`COMPLAINTS_TO`** and **`LOAN_APPLICATION_TO`** to route mail to different addresses (see **`deploy/epicfinance.env.example`**); otherwise **`CONTACT_TO`** is used.
 
+The app loads **`.env.production`** from the server app directory via Next’s **`loadEnvConfig`** when mail runs, so **`WorkingDirectory`** in systemd must stay **`/var/www/epicfinance`**. After creating or editing **`.env.production`**, run **`sudo systemctl restart epicfinance-nextjs`**. Deploy logs warn if **`.env.production`** is missing.
+
 ---
 
 ## Later: update the site
