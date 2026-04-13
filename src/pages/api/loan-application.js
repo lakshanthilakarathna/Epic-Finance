@@ -2,7 +2,11 @@ import {
   LOAN_FORM_FIELD_ORDER,
   REQUIRED_FIELDS,
 } from "@/src/config/loanApplicationForm";
-import { getSmtpContext, sendTransactionalMail } from "@/src/lib/server/smtpMail";
+import {
+  getSmtpContext,
+  resolveMailTo,
+  sendTransactionalMail,
+} from "@/src/lib/server/smtpMail";
 
 export const config = {
   api: {
@@ -81,10 +85,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Unable to send application. Please try again later." });
   }
 
-  const to =
-    process.env.LOAN_APPLICATION_TO ||
-    process.env.CONTACT_TO ||
-    process.env.SMTP_USER;
+  const to = resolveMailTo(
+    process.env.LOAN_APPLICATION_TO,
+    process.env.CONTACT_TO,
+    process.env.SMTP_USER
+  );
 
   const firstName = String(formData.firstName ?? "").trim();
   const lastName = String(formData.lastName ?? "").trim();

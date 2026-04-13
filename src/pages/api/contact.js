@@ -41,12 +41,13 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Please check your details and try again." });
   }
 
-  if (!getSmtpContext()) {
+  const smtpCtx = getSmtpContext();
+  if (!smtpCtx) {
     console.error("contact api: SMTP environment variables are not configured");
     return res.status(500).json({ error: "Unable to send message. Please try again later." });
   }
 
-  const to = process.env.CONTACT_TO || process.env.SMTP_USER;
+  const to = smtpCtx.defaultTo;
 
   const text = [
     `Source: ${source}`,

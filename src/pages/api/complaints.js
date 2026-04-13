@@ -1,4 +1,8 @@
-import { getSmtpContext, sendTransactionalMail } from "@/src/lib/server/smtpMail";
+import {
+  getSmtpContext,
+  resolveMailTo,
+  sendTransactionalMail,
+} from "@/src/lib/server/smtpMail";
 
 export const config = {
   api: {
@@ -70,10 +74,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Unable to send message. Please try again later." });
   }
 
-  const to =
-    process.env.COMPLAINTS_TO ||
-    process.env.CONTACT_TO ||
-    process.env.SMTP_USER;
+  const to = resolveMailTo(
+    process.env.COMPLAINTS_TO,
+    process.env.CONTACT_TO,
+    process.env.SMTP_USER
+  );
 
   const text = [
     "Website complaint / feedback form",

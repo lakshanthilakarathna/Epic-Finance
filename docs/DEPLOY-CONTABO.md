@@ -195,15 +195,33 @@ Follow the prompts. When done, open **https://epicfinance.co.nz** in a browser.
 
 - [ ] Open **https://epicfinance.co.nz/contact**
 - [ ] Send a test message
-- [ ] Email arrives at **CONTACT_TO**
+- [ ] Email arrives at **CONTACT_TO** (check **spam** if nothing in inbox)
 
 If mail fails:
 
 ```bash
-sudo journalctl -u epicfinance-nextjs -n 80 --no-pager
+sudo journalctl -u epicfinance-nextjs -n 120 --no-pager
 ```
 
-Check Zoho app password and **`/var/www/epicfinance/.env.production`** (variables must be set before **`npm run build`** if you change them).
+Look for **`SMTP environment variables are not configured`**, **`smtp: sendMail failed`** (with `responseCode`), or **`smtp: message accepted`** (with `messageId` — proves the provider accepted the message). Check Zoho **app-specific password** and **`/var/www/epicfinance/.env.production`**. After editing `.env.production`, run **`sudo systemctl restart epicfinance-nextjs`** (no rebuild required for SMTP-only changes).
+
+#### Troubleshooting form email (quick)
+
+| What you see | What to check |
+|----------------|---------------|
+| Browser error after submit | DevTools → **Network** → POST **`/api/contact`** (or **`/api/complaints`**, **`/api/loan-application`**) → **status** (400 = validation, 500 = SMTP, 404 = proxy/app) and **response JSON**. |
+| Success in UI but no email | Spam folder; you are watching the mailbox set in **`CONTACT_TO`** (or **`COMPLAINTS_TO`** / **`LOAN_APPLICATION_TO`**). Logs show **`smtp: message accepted`** → provider accepted delivery; trace in Zoho. |
+| Spinner / no response | Network tab: failed or pending request; Nginx/SSL. |
+
+Confirm the env file exists on the VPS:
+
+```bash
+ls -la /var/www/epicfinance/.env.production
+```
+
+Deploy/rsync **does not** upload `.env.production`; create it on the server from **`deploy/epicfinance.env.example`**.
+
+**Zoho checklist:** `SMTP_USER` matches the mailbox; `SMTP_PASS` is an **application-specific** password where required; try **`SMTP_PORT=465`** or **`587`** with comments in the example file; ensure SMTP outbound is allowed for that account.
 
 ---
 

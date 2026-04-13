@@ -20,19 +20,28 @@ function createSmtpTransport(host, port, user, pass) {
   return nodemailer.createTransport(options);
 }
 
+/** First non-empty trimmed env-style value (avoids broken auth from trailing spaces in .env). */
+export function resolveMailTo(...values) {
+  for (const v of values) {
+    const s = String(v ?? "").trim();
+    if (s) return s;
+  }
+  return "";
+}
+
 /**
  * @returns {{ transporter: import('nodemailer').Transporter; user: string; defaultTo: string } | null}
  */
 export function getSmtpContext() {
-  const host = process.env.SMTP_HOST;
+  const host = String(process.env.SMTP_HOST ?? "").trim();
   const port = Number(process.env.SMTP_PORT || 465);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const user = String(process.env.SMTP_USER ?? "").trim();
+  const pass = String(process.env.SMTP_PASS ?? "").trim();
   if (!host || !user || !pass) {
     return null;
   }
   const transporter = createSmtpTransport(host, port, user, pass);
-  const defaultTo = process.env.CONTACT_TO || user;
+  const defaultTo = resolveMailTo(process.env.CONTACT_TO, user);
   return { transporter, user, defaultTo };
 }
 
@@ -44,11 +53,25 @@ export async function sendTransactionalMail(opts) {
   if (!ctx) {
     throw new Error("SMTP_NOT_CONFIGURED");
   }
-  await ctx.transporter.sendMail({
-    from: ctx.user,
-    to: opts.to,
-    replyTo: opts.replyTo,
-    subject: opts.subject,
-    text: opts.text,
-  });
+  try {
+    const info = await ctx.transporter.sendMail({
+      from: ctx.user,
+      to: opts.to,
+      replyTo: opts.replyTo,
+      subject: opts.subject,
+      text: opts.text,
+    });
+    console.info("smtp: message accepted", {
+      messageId: info.messageId,
+      response: info.response,
+    });
+  } catch (e) {
+    console.error("smtp: sendMail failed", {
+      code: e.code,
+      responseCode: e.responseCode,
+      command: e.command,
+      message: e.message,
+    });
+    throw e;
+  }
 }
