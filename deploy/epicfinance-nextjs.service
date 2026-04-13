@@ -3,6 +3,7 @@
 #
 # Uses .env.production in WorkingDirectory (no /etc/epicfinance.env).
 # If node is not at /usr/bin/node, run: readlink -f $(which node)
+# Same as: cd /var/www/epicfinance && npm run start:prod  (package.json → next start -p 3000)
 
 [Unit]
 Description=Epic Finance Next.js
@@ -14,6 +15,7 @@ User=deploy
 Group=deploy
 WorkingDirectory=/var/www/epicfinance
 Environment=NODE_ENV=production
+Environment=PORT=3000
 Environment=HOME=/home/deploy
 ExecStart=/usr/bin/node /var/www/epicfinance/node_modules/next/dist/bin/next start -p 3000
 Restart=on-failure

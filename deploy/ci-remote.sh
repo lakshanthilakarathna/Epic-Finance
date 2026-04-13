@@ -18,6 +18,10 @@ fi
 cd "$REMOTE_APP"
 "$NPM" ci
 "$NPM" run build
+if [ ! -f .next/BUILD_ID ]; then
+  echo "::error::next build did not produce .next/BUILD_ID (build failed or wrong directory)."
+  exit 1
+fi
 
 if ! id -u deploy >/dev/null 2>&1; then
   as_root useradd --system --create-home --shell /bin/bash deploy

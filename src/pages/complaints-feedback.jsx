@@ -1,5 +1,6 @@
 import Layouts from "@/src/layouts/Layouts";
 import PageBanner from "@/src/components/PageBanner";
+import { submitComplaint } from "@/src/lib/submitComplaint";
 import { useMemo, useState } from "react";
 
 const REQUIRED_FIELDS = ["fullName", "email", "complaintType", "description"];
@@ -17,7 +18,8 @@ const initialData = {
 const ComplaintsFeedbackPage = () => {
   const [formData, setFormData] = useState(initialData);
   const [errors, setErrors] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState("idle");
+  const [feedback, setFeedback] = useState("");
 
   const groupedErrors = useMemo(
     () => Object.keys(errors).filter((key) => errors[key]).length,
@@ -47,11 +49,23 @@ const ComplaintsFeedbackPage = () => {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-    setSubmitted(false);
+    setFeedback("");
+    setStatus("idle");
     if (!validate()) return;
-    setSubmitted(true);
+    setStatus("sending");
+    try {
+      await submitComplaint({ ...formData });
+      setStatus("success");
+      setFeedback(
+        "Thank you — your message has been sent. We will respond as soon as we can."
+      );
+      setFormData(initialData);
+    } catch (err) {
+      setStatus("error");
+      setFeedback(err.message || "Something went wrong. Please try again.");
+    }
   };
 
   const renderError = (name) =>
@@ -183,14 +197,24 @@ const ComplaintsFeedbackPage = () => {
               </p>
             )}
 
-            {submitted && (
-              <p className="mil-mb-20" style={{ color: "#2e7d32" }}>
-                Thank you. Your complaint has been recorded locally in this demo form.
+            {feedback ? (
+              <p
+                className={`mil-mb-20 mil-text-sm ${
+                  status === "success" ? "" : "mil-accent"
+                }`}
+                style={status === "success" ? { color: "#2e7d32" } : undefined}
+                role="status"
+              >
+                {feedback}
               </p>
-            )}
+            ) : null}
 
-            <button className="mil-button mil-accent-bg mil-mb-60" type="submit">
-              <span>Submit Complaint</span>
+            <button
+              className="mil-button mil-accent-bg mil-mb-60"
+              type="submit"
+              disabled={status === "sending"}
+            >
+              <span>{status === "sending" ? "Sending…" : "Submit Complaint"}</span>
             </button>
           </form>
 

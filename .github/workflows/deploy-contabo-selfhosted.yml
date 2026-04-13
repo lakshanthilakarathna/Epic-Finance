@@ -24,6 +24,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Preflight build (fail before sync)
+        run: npm ci && npm run build
+
       - name: Sync to /var/www/epicfinance
         run: |
           rsync -av \

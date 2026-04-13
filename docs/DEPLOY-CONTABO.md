@@ -220,6 +220,12 @@ sudo systemctl restart epicfinance-nextjs
 
 **B — From GitHub:** add **Actions secrets** (**Part G, Step 18**), then run **Actions → Deploy to Contabo → Run workflow** (SSH path; manual by default). For **push-to-deploy** without SSH from GitHub, use **Deploy to Contabo (self-hosted)** after installing a runner (**Step 19**).
 
+The **Deploy to Contabo** workflow runs **`npm ci`** and **`npm run build`** on GitHub’s runner **before** SSH/rsync so broken commits fail early (the VPS still runs a full build in **`deploy/ci-remote.sh`**).
+
+### Forms (email via SMTP)
+
+The site sends **contact**, **complaints**, and **loan application** submissions through **`/api/contact`**, **`/api/complaints`**, and **`/api/loan-application`** (same **`next start`** process). All need **`SMTP_*`** in **`.env.production`**. Optional: **`COMPLAINTS_TO`** and **`LOAN_APPLICATION_TO`** to route mail to different addresses (see **`deploy/epicfinance.env.example`**); otherwise **`CONTACT_TO`** is used.
+
 ---
 
 ## Later: update the site

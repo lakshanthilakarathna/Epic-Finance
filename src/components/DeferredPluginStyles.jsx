@@ -1,10 +1,13 @@
 import { useEffect } from "react";
 
-const DEFERRED_STYLES = ["/css/plugins/font-awesome.min.css"];
+const DEFERRED_STYLES = [
+  "/css/plugins/font-awesome.min.css",
+  "/css/plugins/fa-font-display-swap.css",
+];
 
 /**
  * Font Awesome is large and mostly below the fold; load after first paint.
- * Swiper CSS stays in _document.js (hero layout).
+ * fa-font-display-swap.css overrides FA @font-face to use font-display: swap.
  */
 export default function DeferredPluginStyles() {
   useEffect(() => {

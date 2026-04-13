@@ -1,4 +1,4 @@
-import nodemailer from "nodemailer";
+import { getSmtpContext, sendTransactionalMail } from "@/src/lib/server/smtpMail";
 
 const LIMITS = { name: 200, email: 320, phone: 50, message: 10000 };
 
@@ -41,23 +41,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "Please check your details and try again." });
   }
 
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 465);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  const to = process.env.CONTACT_TO || user;
-
-  if (!host || !user || !pass) {
+  if (!getSmtpContext()) {
     console.error("contact api: SMTP environment variables are not configured");
     return res.status(500).json({ error: "Unable to send message. Please try again later." });
   }
 
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-  });
+  const to = process.env.CONTACT_TO || process.env.SMTP_USER;
 
   const text = [
     `Source: ${source}`,
@@ -72,8 +61,7 @@ export default async function handler(req, res) {
     .join("\n");
 
   try {
-    await transporter.sendMail({
-      from: user,
+    await sendTransactionalMail({
       to,
       replyTo: email,
       subject: `Website contact from ${name}`,

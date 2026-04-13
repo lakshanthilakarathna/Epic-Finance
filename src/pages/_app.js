@@ -21,6 +21,7 @@ const fontSora = Sora({
   subsets: ["latin"],
   variable: "--font-sora",
   display: "swap",
+  adjustFontFallback: true,
 });
 
 const fontSatisfy = Satisfy({

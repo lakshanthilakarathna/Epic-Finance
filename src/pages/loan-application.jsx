@@ -1,75 +1,11 @@
 import Layouts from "@/src/layouts/Layouts";
 import PageBanner from "@/src/components/PageBanner";
+import {
+  initialData,
+  REQUIRED_FIELDS,
+} from "@/src/config/loanApplicationForm";
+import { submitLoanApplication } from "@/src/lib/submitLoanApplication";
 import { useMemo, useState } from "react";
-
-const REQUIRED_FIELDS = [
-  "firstName",
-  "lastName",
-  "email",
-  "phone",
-  "streetAddress",
-  "city",
-  "stateRegion",
-  "postalCode",
-  "monthsAtAddress",
-  "dob",
-  "gender",
-  "maritalStatus",
-  "dependants",
-  "employer",
-  "monthsWithEmployer",
-  "jobTitle",
-  "incomeType",
-  "salaryAfterTax",
-  "salaryFrequency",
-  "visaType",
-  "livingCondition",
-  "rentMortgagePayment",
-  "paymentFrequency",
-  "monthlyExpenses",
-  "loanType",
-  "loanAmount",
-  "incomeExpenseChanges",
-  "consentMarketing",
-  "consentDataProcessing",
-];
-
-const initialData = {
-  firstName: "",
-  middleName: "",
-  lastName: "",
-  email: "",
-  countryCode: "+64",
-  phone: "",
-  streetAddress: "",
-  city: "",
-  stateRegion: "",
-  countryRegionCode: "New Zealand",
-  postalCode: "",
-  monthsAtAddress: "",
-  dob: "",
-  gender: "",
-  maritalStatus: "",
-  dependants: "",
-  referenceName: "",
-  referencePhone: "",
-  employer: "",
-  monthsWithEmployer: "",
-  jobTitle: "",
-  incomeType: "",
-  salaryAfterTax: "",
-  salaryFrequency: "",
-  visaType: "",
-  livingCondition: "Renting",
-  rentMortgagePayment: "",
-  paymentFrequency: "Weekly",
-  monthlyExpenses: "",
-  loanType: "",
-  loanAmount: "",
-  incomeExpenseChanges: "",
-  consentMarketing: false,
-  consentDataProcessing: false,
-};
 
 const LoanApplicationPage = () => {
   const [formData, setFormData] = useState(initialData);
@@ -80,7 +16,8 @@ const LoanApplicationPage = () => {
     visaCopy: "No file chosen",
     passportCopy: "No file chosen",
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus] = useState("idle");
+  const [feedback, setFeedback] = useState("");
 
   const groupedErrors = useMemo(
     () => Object.keys(errors).filter((key) => errors[key]).length,
@@ -121,11 +58,29 @@ const LoanApplicationPage = () => {
     return Object.keys(nextErrors).length === 0;
   };
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
-    setSubmitted(false);
+    setFeedback("");
+    setStatus("idle");
     if (!validate()) return;
-    setSubmitted(true);
+    setStatus("sending");
+    try {
+      await submitLoanApplication({ formData, fileNames });
+      setStatus("success");
+      setFeedback(
+        "Thank you — your application has been sent. We will be in touch soon."
+      );
+      setFormData(initialData);
+      setFileNames({
+        driverFront: "No file chosen",
+        driverBack: "No file chosen",
+        visaCopy: "No file chosen",
+        passportCopy: "No file chosen",
+      });
+    } catch (err) {
+      setStatus("error");
+      setFeedback(err.message || "Something went wrong. Please try again.");
+    }
   };
 
   const renderError = (name) =>
@@ -641,14 +596,26 @@ const LoanApplicationPage = () => {
                 Please complete all required fields before submitting.
               </p>
             )}
-            {submitted && (
-              <p className="mil-mb-20" style={{ color: "#2e7d32" }}>
-                Your application is ready and has been recorded locally in this demo form.
+            {feedback ? (
+              <p
+                className={`mil-mb-20 mil-text-sm ${
+                  status === "success" ? "" : "mil-accent"
+                }`}
+                style={status === "success" ? { color: "#2e7d32" } : undefined}
+                role="status"
+              >
+                {feedback}
               </p>
-            )}
+            ) : null}
 
-            <button className="mil-button mil-accent-bg" type="submit">
-              <span>Submit Loan Application</span>
+            <button
+              className="mil-button mil-accent-bg"
+              type="submit"
+              disabled={status === "sending"}
+            >
+              <span>
+                {status === "sending" ? "Sending…" : "Submit Loan Application"}
+              </span>
             </button>
           </form>
         </div>

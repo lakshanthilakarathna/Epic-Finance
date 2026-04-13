@@ -47,16 +47,21 @@ const DefaultFooter = () => {
                   </p>
                 </div>
                 <div className="col-lg-5 mil-mb-30">
-                  <form>
-                    <input
-                      className="mil-rounded-input mil-text-center mil-mb-5"
-                      type="text"
-                      placeholder="Your email address"
-                    />
-                    <button className="mil-button mil-accent-bg mil-fw">
-                      <span>Subscribe Now</span>
-                    </button>
-                  </form>
+                  <p className="mil-light-soft mil-mb-15 mil-text-sm">
+                    Questions or updates? Reach us on the contact page or by email.
+                  </p>
+                  <Link
+                    href="/contact"
+                    className="mil-button mil-accent-bg mil-fw mil-mb-10"
+                  >
+                    <span>Contact us</span>
+                  </Link>
+                  <a
+                    href="mailto:info@epicfinance.co.nz"
+                    className="mil-button mil-border mil-light mil-fw"
+                  >
+                    <span>info@epicfinance.co.nz</span>
+                  </a>
                 </div>
               </div>
             </div>

@@ -20,7 +20,7 @@ const ServicesSection = ({ sectionId }) => {
               <div className="mil-service-item">
                 <div className="mil-service-icon">
                   <div className="mil-icon-frame mil-icon-frame-md">
-                    <img src={item.icon} alt="icon" />
+                    <img src={`/${item.icon}`} alt="" width={45} height={45} />
                   </div>
                 </div>
                 <div className="mil-service-text">
@@ -46,7 +46,7 @@ const ServicesSection = ({ sectionId }) => {
               <div className="mil-service-item">
                 <div className="mil-service-icon">
                   <div className="mil-icon-frame mil-icon-frame-md">
-                    <img src={item.icon} alt="icon" />
+                    <img src={`/${item.icon}`} alt="" width={45} height={45} />
                   </div>
                 </div>
                 <div className="mil-service-text">

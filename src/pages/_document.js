@@ -21,9 +21,8 @@ class MyDocument extends Document {
           <meta name="theme-color" content="#ffffff" />
           {/* favicon */}
 
-          {/* Bootstrap + Swiper in head; Font Awesome deferred in _app.js (DeferredPluginStyles) */}
+          {/* Bootstrap grid in head; Swiper CSS from bundled imports (sliderProps.js); Font Awesome deferred in _app.js */}
           <link rel="stylesheet" href="/css/plugins/bootstrap-grid.css" />
-          <link rel="stylesheet" href="/css/plugins/swiper.min.css" />
         </Head>
         <body>
           <Main />
