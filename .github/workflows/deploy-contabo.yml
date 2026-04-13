@@ -95,16 +95,43 @@ jobs:
             -e "ssh -4 -i \"$HOME/.ssh/deploy_key\" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=30" \
             ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
-      # Non-interactive SSH uses a minimal PATH; `bash -lc` loads login profile (NodeSource/nvm in .profile).
+      # Same `ssh` as rsync (appleboy/drone-ssh can invoke bash differently). Resolve npm in common locations.
       - name: Install, build, restart
-        uses: appleboy/ssh-action@v1.2.0
-        with:
-          host: ${{ env.DEPLOY_HOST }}
-          username: ${{ env.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          port: 22
-          timeout: 60s
-          command_timeout: 20m
-          script_stop: true
-          script: |
-            /bin/bash -lc "set -e; cd '${{ env.DEPLOY_PATH }}' && npm ci && npm run build && sudo systemctl restart epicfinance-nextjs"
+        run: |
+          ssh -4 -i "$HOME/.ssh/deploy_key" \
+            -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=30 -o ServerAliveInterval=30 -o ServerAliveCountMax=120 \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "REMOTE_APP='${{ env.DEPLOY_PATH }}' bash -s" << 'REMOTE'
+          set -euo pipefail
+          as_root() { if [ "$(id -u)" -eq 0 ]; then "$@"; else sudo "$@"; fi; }
+          export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+          if command -v npm >/dev/null 2>&1; then NPM=npm
+          elif [ -x /usr/bin/npm ]; then NPM=/usr/bin/npm
+          elif [ -x /usr/local/bin/npm ]; then NPM=/usr/local/bin/npm
+          else
+            echo "::error::npm not found on the VPS. As root run: curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs"
+            exit 127
+          fi
+          cd "$REMOTE_APP"
+          "$NPM" ci
+          "$NPM" run build
+
+          # epicfinance-nextjs.service uses User=deploy; unit must exist under /etc/systemd/system/
+          if ! id -u deploy >/dev/null 2>&1; then
+            as_root useradd --system --create-home --shell /bin/bash deploy
+          fi
+          SVC_SRC="$REMOTE_APP/deploy/epicfinance-nextjs.service"
+          SVC_DST="/etc/systemd/system/epicfinance-nextjs.service"
+          if [ ! -f "$SVC_DST" ]; then
+            if [ ! -f "$SVC_SRC" ]; then
+              echo "::error::Missing $SVC_SRC. Ensure deploy/epicfinance-nextjs.service is in the repo."
+              exit 1
+            fi
+            as_root cp "$SVC_SRC" "$SVC_DST"
+            as_root systemctl daemon-reload
+            as_root systemctl enable epicfinance-nextjs
+          fi
+          as_root chown -R deploy:deploy "$REMOTE_APP"
+          as_root systemctl restart epicfinance-nextjs
+          REMOTE
