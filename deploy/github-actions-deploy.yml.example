@@ -1,22 +1,17 @@
-# Optional: deploy from GitHub Actions on every push to `main`.
+# Optional: copy to .github/workflows/deploy-contabo.yml
 #
-# Setup:
-# 1. Copy this file to: .github/workflows/deploy-contabo.yml
-# 2. Repo → Settings → Secrets and variables → Actions → New repository secret:
-#    - DEPLOY_HOST     (e.g. 173.212.208.181 or a hostname)
-#    - DEPLOY_USER     (e.g. deploy — must own /var/www/epicfinance)
-#    - DEPLOY_SSH_KEY  (private key PEM; matching public key in ~/.ssh/authorized_keys on VPS)
-# 3. On the VPS, the deploy user must run builds and restart the app. Either:
-#    - sudo without password for one command (recommended), as root run visudo and add:
-#        deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart epicfinance-nextjs
-#    - or set DEPLOY_USER to root and install the deploy key for root (simpler, less ideal)
-# 4. Keep .env.production only on the server — it is excluded from rsync below.
+# GitHub → Settings → Secrets and variables → Actions:
+#   Secrets:   DEPLOY_SSH_KEY only (private key, multiline)
+#   Variables: DEPLOY_HOST (e.g. 173.212.208.181), DEPLOY_USER (e.g. root or deploy)
+#
+# See docs/DEPLOY-CONTABO.md Part G.
 
 name: Deploy to Contabo
 
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -32,7 +27,7 @@ jobs:
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -H "${{ vars.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Rsync to VPS
         run: |
@@ -43,13 +38,13 @@ jobs:
             --exclude .env.local \
             --exclude .env.production \
             -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes" \
-            ./ "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/"
+            ./ "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/"
 
       - name: Install, build, restart
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script_stop: true
           script: |
