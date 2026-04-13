@@ -1,7 +1,4 @@
 # Copy to .github/workflows/deploy-contabo.yml — see docs/DEPLOY-CONTABO.md Part G
-#
-# Secrets: DEPLOY_SSH_KEY
-# Variables and/or Secrets: DEPLOY_HOST, DEPLOY_USER (workflow: vars || secrets)
 
 name: Deploy to Contabo
 
@@ -26,42 +23,43 @@ jobs:
 
       - name: Check DEPLOY_HOST and DEPLOY_USER are set
         run: |
-          if [ -z "$DEPLOY_HOST" ]; then
-            echo "::error::DEPLOY_HOST is empty"
+          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_USER" ]; then
+            echo "::error::Set DEPLOY_HOST and DEPLOY_USER (Variables or Secrets)."
             exit 1
           fi
-          if [ -z "$DEPLOY_USER" ]; then
-            echo "::error::DEPLOY_USER is empty"
+
+      - name: Probe IPv4 TCP port 22 (firewall check)
+        run: |
+          if ! timeout 12 bash -c "echo >/dev/tcp/${DEPLOY_HOST}/22" 2>/dev/null; then
+            echo "::error::Cannot reach port 22 — check UFW and Contabo firewall."
             exit 1
           fi
 
       - name: Add SSH key and known_hosts
         run: |
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          timeout 25 ssh-keyscan -4 -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
       - name: Test SSH
         run: |
-          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=30 \
-            "${DEPLOY_USER}@${DEPLOY_HOST}" "echo ssh_ok"
+          ssh -4 -i "$HOME/.ssh/deploy_key" \
+            -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" "echo ok"
 
       - name: Ensure deploy directory exists on VPS
         run: |
-          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes \
+          ssh -4 -i "$HOME/.ssh/deploy_key" \
+            -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
             "${DEPLOY_USER}@${DEPLOY_HOST}" "mkdir -p '${DEPLOY_PATH}'"
 
       - name: Rsync to VPS
         run: |
           rsync -avz \
-            --exclude node_modules \
-            --exclude .next \
-            --exclude .git \
-            --exclude .env.local \
-            --exclude .env.production \
-            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes" \
+            --exclude node_modules --exclude .next --exclude .git \
+            --exclude .env.local --exclude .env.production \
+            -e "ssh -4 -i \"$HOME/.ssh/deploy_key\" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20" \
             ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
       - name: Install, build, restart
@@ -70,6 +68,8 @@ jobs:
           host: ${{ env.DEPLOY_HOST }}
           username: ${{ env.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          port: 22
+          timeout: 30s
           command_timeout: 20m
           script_stop: true
           script: |
