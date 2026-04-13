@@ -218,7 +218,7 @@ npm run build
 sudo systemctl restart epicfinance-nextjs
 ```
 
-**B — From GitHub (automatic):** add **Actions secrets** (**Part G, Step 18**), then **`git push` to `main`** or run **Actions → Deploy to Contabo → Run workflow**. The workflow file is **`.github/workflows/deploy-contabo.yml`**.
+**B — From GitHub:** add **Actions secrets** (**Part G, Step 18**), then run **Actions → Deploy to Contabo → Run workflow** (SSH path; manual by default). For **push-to-deploy** without SSH from GitHub, use **Deploy to Contabo (self-hosted)** after installing a runner (**Step 19**).
 
 ---
 
@@ -292,7 +292,7 @@ echo 'deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart epicfinance-nextjs' > /e
 chmod 440 /etc/sudoers.d/epicfinance-deploy
 ```
 
-4. The workflow file **`.github/workflows/deploy-contabo.yml`** is already in this repo. After secrets and sudo are set, push to **`main`** or use **Actions → Deploy to Contabo → Run workflow**.
+4. The workflow **`.github/workflows/deploy-contabo.yml`** (SSH from GitHub) runs **manually only** by default (**Actions → Deploy to Contabo → Run workflow**). Pushes to **`main`** do not start it, so a blocked port 22 does not fail every commit. When SSH from GitHub works, you may edit that file and add **`push: branches: [main]`** under **`on:`** for automatic deploys.
 
 The workflow **rsyncs** the repo to **`/var/www/epicfinance`** and excludes **`.env.production`**. The **[deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example)** file is a duplicate reference copy.
 
@@ -307,7 +307,7 @@ If **Probe** or **Test SSH** never succeeds from **ubuntu-latest** but your **Ma
 1. On the VPS: install Node.js if needed (same as Part B). Ensure **`/var/www/epicfinance`** exists and the runner user can write it.
 2. GitHub: **Settings → Actions → Runners → New self-hosted runner** — choose **Linux** / **x64**, follow the download and **`./config.sh`** steps. Install as a service (**`./svc.sh install`** then **`./svc.sh start`**).
 3. If the runner user is not **root**, allow **`sudo systemctl restart epicfinance-nextjs`** without a password (same idea as Step 18, sudoers snippet for that user).
-4. **Actions → Deploy to Contabo (self-hosted) → Run workflow**. When it goes green, you can edit **`.github/workflows/deploy-contabo-selfhosted.yml`** to add **`push: branches: [main]`** under **`on:`**, and **disable** the workflow **Deploy to Contabo** (the SSH one) so pushes do not keep failing.
+4. **Actions → Deploy to Contabo (self-hosted) → Run workflow**. When it goes green, edit **`.github/workflows/deploy-contabo-selfhosted.yml`** and add **`push: branches: [main]`** under **`on:`** so every **`git push`** to **`main`** deploys. The SSH workflow **Deploy to Contabo** is manual-only by default and no longer runs on push.
 
 ---
 

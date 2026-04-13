@@ -10,7 +10,7 @@
 # After the runner is online and a manual run succeeds: add to `on:` below:
 #   push:
 #     branches: [main]
-# Then disable workflow "Deploy to Contabo" (SSH) in Actions → … so only this job runs.
+# The SSH workflow "Deploy to Contabo" does not run on push by default.
 
 name: Deploy to Contabo (self-hosted)
 

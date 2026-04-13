@@ -4,11 +4,12 @@
 # If still failing: open run log — note which step is red (Probe vs Validate key vs Test SSH).
 # Contabo may block datacenter IPs; if Probe passes but SSH fails, try a self-hosted runner on the VPS.
 # See docs/DEPLOY-CONTABO.md Part G
+#
+# Manual-only by default: many VPS hosts block SSH from GitHub (Azure) IPs — that run always fails on push.
+# Re-add `push: branches: [main]` below when port 22 works from ubuntu-latest, or use deploy-contabo-selfhosted.yml.
 name: Deploy to Contabo
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
