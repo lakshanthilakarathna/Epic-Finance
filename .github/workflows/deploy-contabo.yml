@@ -5,15 +5,20 @@
 # Contabo may block datacenter IPs; if Probe passes but SSH fails, try a self-hosted runner on the VPS.
 # See docs/DEPLOY-CONTABO.md Part G
 #
-# Manual-only by default: many VPS hosts block SSH from GitHub (Azure) IPs — that run always fails on push.
-# Re-add `push: branches: [main]` below when port 22 works from ubuntu-latest, or use deploy-contabo-selfhosted.yml.
+# If push deploys fail with "Cannot reach …:22", Contabo may be blocking GitHub IPs — comment out `push` and use workflow_dispatch only, or use deploy-contabo-selfhosted.yml with a runner on the VPS.
 name: Deploy to Contabo
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: deploy-contabo-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -95,43 +100,11 @@ jobs:
             -e "ssh -4 -i \"$HOME/.ssh/deploy_key\" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=30" \
             ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
-      # Same `ssh` as rsync (appleboy/drone-ssh can invoke bash differently). Resolve npm in common locations.
+      # Remote logic lives in deploy/ci-remote.sh (avoids YAML/heredoc edge cases on the runner).
       - name: Install, build, restart
         run: |
           ssh -4 -i "$HOME/.ssh/deploy_key" \
             -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes \
             -o ConnectTimeout=30 -o ServerAliveInterval=30 -o ServerAliveCountMax=120 \
             "${DEPLOY_USER}@${DEPLOY_HOST}" \
-            "REMOTE_APP='${{ env.DEPLOY_PATH }}' bash -s" << 'REMOTE'
-          set -euo pipefail
-          as_root() { if [ "$(id -u)" -eq 0 ]; then "$@"; else sudo "$@"; fi; }
-          export PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
-          if command -v npm >/dev/null 2>&1; then NPM=npm
-          elif [ -x /usr/bin/npm ]; then NPM=/usr/bin/npm
-          elif [ -x /usr/local/bin/npm ]; then NPM=/usr/local/bin/npm
-          else
-            echo "::error::npm not found on the VPS. As root run: curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && apt-get install -y nodejs"
-            exit 127
-          fi
-          cd "$REMOTE_APP"
-          "$NPM" ci
-          "$NPM" run build
-
-          # epicfinance-nextjs.service uses User=deploy; unit must exist under /etc/systemd/system/
-          if ! id -u deploy >/dev/null 2>&1; then
-            as_root useradd --system --create-home --shell /bin/bash deploy
-          fi
-          SVC_SRC="$REMOTE_APP/deploy/epicfinance-nextjs.service"
-          SVC_DST="/etc/systemd/system/epicfinance-nextjs.service"
-          if [ ! -f "$SVC_DST" ]; then
-            if [ ! -f "$SVC_SRC" ]; then
-              echo "::error::Missing $SVC_SRC. Ensure deploy/epicfinance-nextjs.service is in the repo."
-              exit 1
-            fi
-            as_root cp "$SVC_SRC" "$SVC_DST"
-            as_root systemctl daemon-reload
-            as_root systemctl enable epicfinance-nextjs
-          fi
-          as_root chown -R deploy:deploy "$REMOTE_APP"
-          as_root systemctl restart epicfinance-nextjs
-          REMOTE
+            "export REMOTE_APP='${{ env.DEPLOY_PATH }}'; bash -s" < deploy/ci-remote.sh
