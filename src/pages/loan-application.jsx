@@ -16,6 +16,13 @@ const LoanApplicationPage = () => {
     visaCopy: "No file chosen",
     passportCopy: "No file chosen",
   });
+  const [fileSlots, setFileSlots] = useState({
+    driverFront: null,
+    driverBack: null,
+    visaCopy: null,
+    passportCopy: null,
+  });
+  const [fileInputKey, setFileInputKey] = useState(0);
   const [status, setStatus] = useState("idle");
   const [feedback, setFeedback] = useState("");
 
@@ -37,11 +44,12 @@ const LoanApplicationPage = () => {
   };
 
   const onFileChange = (name, event) => {
-    const fileName =
-      event.target.files && event.target.files[0]
-        ? event.target.files[0].name
-        : "No file chosen";
-    setFileNames((prev) => ({ ...prev, [name]: fileName }));
+    const file = event.target.files && event.target.files[0] ? event.target.files[0] : null;
+    setFileSlots((prev) => ({ ...prev, [name]: file }));
+    setFileNames((prev) => ({
+      ...prev,
+      [name]: file ? file.name : "No file chosen",
+    }));
   };
 
   const validate = () => {
@@ -65,18 +73,32 @@ const LoanApplicationPage = () => {
     if (!validate()) return;
     setStatus("sending");
     try {
-      await submitLoanApplication({ formData, fileNames });
+      const fd = new FormData();
+      fd.append("payload", JSON.stringify(formData));
+      const docKeys = ["driverFront", "driverBack", "visaCopy", "passportCopy"];
+      for (const key of docKeys) {
+        const f = fileSlots[key];
+        if (f) fd.append(key, f, f.name);
+      }
+      await submitLoanApplication(fd);
       setStatus("success");
       setFeedback(
         "Thank you — your application has been sent. We will be in touch soon."
       );
       setFormData(initialData);
+      setFileSlots({
+        driverFront: null,
+        driverBack: null,
+        visaCopy: null,
+        passportCopy: null,
+      });
       setFileNames({
         driverFront: "No file chosen",
         driverBack: "No file chosen",
         visaCopy: "No file chosen",
         passportCopy: "No file chosen",
       });
+      setFileInputKey((k) => k + 1);
     } catch (err) {
       setStatus("error");
       setFeedback(err.message || "Something went wrong. Please try again.");
@@ -494,13 +516,17 @@ const LoanApplicationPage = () => {
             <h4 className="mil-mb-60">
               <span className="mil-accent">06.</span> Upload Required Documents
             </h4>
-            <div className="row">
+            <div className="row" key={fileInputKey}>
               <div className="col-lg-6">
                 <div className="mil-attach-frame mil-dark mil-mb-30">
                   <i className="fas fa-paperclip" />
                   <label className="mil-custom-file-input">
                     <span>Driver Licence Front</span>
-                    <input type="file" onChange={(e) => onFileChange("driverFront", e)} />
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      onChange={(e) => onFileChange("driverFront", e)}
+                    />
                   </label>
                   <p className="mil-text-sm">{fileNames.driverFront}</p>
                 </div>
@@ -510,7 +536,11 @@ const LoanApplicationPage = () => {
                   <i className="fas fa-paperclip" />
                   <label className="mil-custom-file-input">
                     <span>Driver Licence Back</span>
-                    <input type="file" onChange={(e) => onFileChange("driverBack", e)} />
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      onChange={(e) => onFileChange("driverBack", e)}
+                    />
                   </label>
                   <p className="mil-text-sm">{fileNames.driverBack}</p>
                 </div>
@@ -520,7 +550,11 @@ const LoanApplicationPage = () => {
                   <i className="fas fa-paperclip" />
                   <label className="mil-custom-file-input">
                     <span>Visa Copy (if not NZ Citizen)</span>
-                    <input type="file" onChange={(e) => onFileChange("visaCopy", e)} />
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      onChange={(e) => onFileChange("visaCopy", e)}
+                    />
                   </label>
                   <p className="mil-text-sm">{fileNames.visaCopy}</p>
                 </div>
@@ -530,7 +564,11 @@ const LoanApplicationPage = () => {
                   <i className="fas fa-paperclip" />
                   <label className="mil-custom-file-input">
                     <span>Passport Copy (if not NZ Citizen)</span>
-                    <input type="file" onChange={(e) => onFileChange("passportCopy", e)} />
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      onChange={(e) => onFileChange("passportCopy", e)}
+                    />
                   </label>
                   <p className="mil-text-sm">{fileNames.passportCopy}</p>
                 </div>

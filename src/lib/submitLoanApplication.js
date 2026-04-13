@@ -1,8 +1,13 @@
-import { postFormJson } from "@/src/lib/postFormJson";
+import { parseJsonApiResponse } from "@/src/lib/parseJsonApiResponse";
 
 /**
- * @param {{ formData: Record<string, unknown>; fileNames?: Record<string, string> }} payload
+ * POST multipart form (payload JSON + optional document files) to /api/loan-application.
+ * @param {FormData} formData
  */
-export async function submitLoanApplication(payload) {
-  return postFormJson("/api/loan-application", payload);
+export async function submitLoanApplication(formData) {
+  const res = await fetch("/api/loan-application", {
+    method: "POST",
+    body: formData,
+  });
+  return parseJsonApiResponse(res);
 }

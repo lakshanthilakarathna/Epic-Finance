@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.7",
+    "formidable": "^2.1.2",
     "gray-matter": "^4.0.3",
     "next": "13.4.3",
     "nodemailer": "^8.0.5",

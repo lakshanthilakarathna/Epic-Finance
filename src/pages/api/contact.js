@@ -1,3 +1,4 @@
+import { buildContactEmail } from "@/src/lib/server/mailLayout";
 import { getSmtpContext, sendTransactionalMail } from "@/src/lib/server/smtpMail";
 
 const LIMITS = { name: 200, email: 320, phone: 50, message: 10000 };
@@ -52,17 +53,14 @@ export default async function handler(req, res) {
 
   const to = smtpCtx.defaultTo;
 
-  const text = [
-    `Source: ${source}`,
-    `Name: ${name}`,
-    `Email: ${email}`,
-    phone ? `Phone: ${phone}` : null,
-    `Marketing opt-in: ${marketingOptIn ? "yes" : "no"}`,
-    "",
+  const { text, html } = buildContactEmail({
+    name,
+    email,
+    phone,
+    source,
+    marketingOptIn,
     message,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  });
 
   try {
     await sendTransactionalMail({
@@ -70,6 +68,7 @@ export default async function handler(req, res) {
       replyTo: email,
       subject: `Website contact from ${name}`,
       text,
+      html,
     });
     return res.status(200).json({ ok: true });
   } catch (e) {

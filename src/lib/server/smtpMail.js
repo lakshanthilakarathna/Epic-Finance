@@ -141,7 +141,14 @@ export function getSmtpContext() {
 }
 
 /**
- * @param {{ to: string; subject: string; text: string; replyTo?: string }} opts
+ * @param {{
+ *   to: string;
+ *   subject: string;
+ *   text: string;
+ *   html?: string;
+ *   replyTo?: string;
+ *   attachments?: import('nodemailer').Attachment[];
+ * }} opts
  */
 export async function sendTransactionalMail(opts) {
   const ctx = getSmtpContext();
@@ -149,13 +156,16 @@ export async function sendTransactionalMail(opts) {
     throw new Error("SMTP_NOT_CONFIGURED");
   }
   try {
-    const info = await ctx.transporter.sendMail({
+    const mail = {
       from: ctx.from,
       to: opts.to,
       replyTo: opts.replyTo,
       subject: opts.subject,
       text: opts.text,
-    });
+    };
+    if (opts.html) mail.html = opts.html;
+    if (opts.attachments?.length) mail.attachments = opts.attachments;
+    const info = await ctx.transporter.sendMail(mail);
     console.info("smtp: message accepted", {
       messageId: info.messageId,
       response: info.response,

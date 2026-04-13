@@ -8,6 +8,9 @@ server {
     listen [::]:80;
     server_name yourdomain.com www.yourdomain.com;
 
+    # Loan application uploads (multipart). Default 1m is too small.
+    client_max_body_size 20m;
+
     location / {
         proxy_pass http://127.0.0.1:3000;
         proxy_http_version 1.1;

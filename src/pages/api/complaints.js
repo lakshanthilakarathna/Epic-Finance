@@ -1,3 +1,4 @@
+import { buildComplaintEmail } from "@/src/lib/server/mailLayout";
 import {
   getSmtpContext,
   resolveMailTo,
@@ -83,19 +84,15 @@ export default async function handler(req, res) {
     process.env.SMTP_USER
   );
 
-  const text = [
-    "Website complaint / feedback form",
-    `Full name: ${fullName}`,
-    `Email: ${email}`,
-    phone ? `Phone: ${phone}` : null,
-    accountNumber ? `Account number: ${accountNumber}` : null,
-    `Complaint type: ${complaintType}`,
-    `Preferred contact: ${preferredContactMethod}`,
-    "",
+  const { text, html } = buildComplaintEmail({
+    fullName,
+    email,
+    phone,
+    accountNumber,
+    complaintType,
+    preferredContactMethod,
     description,
-  ]
-    .filter(Boolean)
-    .join("\n");
+  });
 
   try {
     await sendTransactionalMail({
@@ -103,6 +100,7 @@ export default async function handler(req, res) {
       replyTo: email,
       subject: `Website complaint from ${fullName}`,
       text,
+      html,
     });
     return res.status(200).json({ ok: true });
   } catch (e) {

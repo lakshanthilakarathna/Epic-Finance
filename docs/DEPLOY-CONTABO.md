@@ -164,6 +164,8 @@ Set:
 server_name epicfinance.co.nz www.epicfinance.co.nz;
 ```
 
+The example config sets **`client_max_body_size 20m`** so the **loan application** can upload documents (JPEG/PNG/WebP/PDF). If you omit it, Nginx may return **413** for larger multipart requests.
+
 Save. Enable site and reload:
 
 ```bash
