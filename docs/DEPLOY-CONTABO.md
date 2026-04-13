@@ -283,7 +283,7 @@ sudo -u deploy cat /home/deploy/.ssh/github_actions_deploy
 
 (If you prefer **`root`** for deploy SSH instead, generate under `/root/.ssh` and add the `.pub` line to `/root/.ssh/authorized_keys` instead.)
 
-2. Add **Repository variables** (same settings page → **Variables** tab): **`DEPLOY_HOST`** (e.g. `173.212.208.181`) and **`DEPLOY_USER`** (`deploy` or `root`). The workflow reads these as `vars.*`; only **`DEPLOY_SSH_KEY`** uses **Secrets**.
+2. Add **`DEPLOY_HOST`** (VPS IP or hostname) and **`DEPLOY_USER`** (`deploy` or `root`) as **Repository variables** *or* **Secrets** (the workflow accepts either). Only **`DEPLOY_SSH_KEY`** must be a **Secret** (never a Variable).
 
 3. If **`DEPLOY_USER`** is `deploy`, allow a passwordless restart (as **root** on the VPS):
 

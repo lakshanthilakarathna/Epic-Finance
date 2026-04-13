@@ -1,6 +1,9 @@
 # Requires:
-#   Secret:  DEPLOY_SSH_KEY (private key — Repository secrets only, never Variables)
-#   Variables (or secrets): DEPLOY_HOST, DEPLOY_USER — see docs/DEPLOY-CONTABO.md Part G
+#   Secret:  DEPLOY_SSH_KEY (private key — Repository → Secrets only)
+#   Host/user: set EITHER as Repository Variables OR Secrets (both work):
+#     DEPLOY_HOST  (e.g. 173.212.208.181)
+#     DEPLOY_USER  (e.g. root or deploy)
+# See docs/DEPLOY-CONTABO.md Part G
 name: Deploy to Contabo
 
 on:
@@ -13,16 +16,35 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEPLOY_PATH: /var/www/epicfinance
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST || secrets.DEPLOY_HOST }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER || secrets.DEPLOY_USER }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Fail if DEPLOY_SSH_KEY secret is missing
+        if: ${{ secrets.DEPLOY_SSH_KEY == '' }}
+        run: |
+          echo "::error::Add repository secret DEPLOY_SSH_KEY (Settings → Secrets and variables → Actions → Secrets)."
+          exit 1
+
+      - name: Check DEPLOY_HOST and DEPLOY_USER are set
+        run: |
+          if [ -z "$DEPLOY_HOST" ]; then
+            echo "::error::DEPLOY_HOST is empty. Add Variable or Secret DEPLOY_HOST (IP or hostname)."
+            exit 1
+          fi
+          if [ -z "$DEPLOY_USER" ]; then
+            echo "::error::DEPLOY_USER is empty. Add Variable or Secret DEPLOY_USER (e.g. root or deploy)."
+            exit 1
+          fi
 
       - name: Add SSH key
         run: |
           mkdir -p ~/.ssh
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "${{ vars.DEPLOY_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
 
       - name: Rsync to VPS
         run: |
@@ -33,13 +55,13 @@ jobs:
             --exclude .env.local \
             --exclude .env.production \
             -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes" \
-            ./ "${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}:${{ env.DEPLOY_PATH }}/"
+            ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
       - name: Install, build, restart
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ vars.DEPLOY_HOST }}
-          username: ${{ vars.DEPLOY_USER }}
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script_stop: true
           script: |
