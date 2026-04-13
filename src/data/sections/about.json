@@ -1,5 +1,5 @@
 {
-    "image": "img/photo/Epic Finance8.jpg",
+    "image": "/img/photo/about-main.webp",
     "title": "How We Collaborate With You",
     "subtitle": "About us",
     "text": "At Epic Finance, we make it simple for people across New Zealand to access the finance they need, regardless of background, visa status, or financial situation. Whether you are a citizen, resident, student, or on a work visa, we are here to help you move forward with confidence.",
@@ -11,19 +11,19 @@
     },
     "speakers": [
         {
-            "image": "img/faces/Epic Financer1.jpg",
+            "image": "/img/faces/avatar-financer-1.webp",
             "alt": "Epic Finance client"
         },
         {
-            "image": "img/faces/Epic Financer2.jpg",
+            "image": "/img/faces/avatar-financer-2.webp",
             "alt": "Epic Finance client"
         },
         {
-            "image": "img/faces/Epic Financer3.jpg",
+            "image": "/img/faces/avatar-financer-3.webp",
             "alt": "Epic Finance client"
         },
         {
-            "image": "img/faces/Epic Financer4.jpg",
+            "image": "/img/faces/avatar-financer-4.webp",
             "alt": "Epic Finance client"
         }
     ]

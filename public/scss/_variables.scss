@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Satisfy&family=Sora:wght@100;200;300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap');
+// Google Fonts are loaded via next/font/google in _app.js (--font-syne, --font-sora, --font-satisfy).
 
-$font-1: 'Syne', sans-serif;
-$font-2: 'Sora', sans-serif;
-$font-3: 'Satisfy', cursive;
+$font-1: var(--font-syne), sans-serif;
+$font-2: var(--font-sora), sans-serif;
+$font-3: var(--font-satisfy), cursive;
 
 $dark: rgba(18, 24, 32, 1);
 $light: rgba(255, 255, 255, 1);

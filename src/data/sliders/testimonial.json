@@ -4,31 +4,31 @@
     "items": [
         {
             "name": "Jason Perera",
-            "image": "img/faces/Epic Financer1.jpg",
+            "image": "/img/faces/avatar-financer-1.webp",
             "role": "First-time Car Buyer",
             "text": "Epic Finance made my first car purchase straightforward. They explained every option clearly, helped me choose a repayment plan I could manage, and got everything approved much faster than I expected."
         },
         {
             "name": "Mia Thompson",
-            "image": "img/faces/Epic Financer2.jpg",
+            "image": "/img/faces/avatar-financer-2.webp",
             "role": "Work Visa Holder",
             "text": "As someone on a work visa, I was worried my application would be difficult. The Epic Finance team understood my situation, compared lender options for me, and made the entire process feel easy and fair."
         },
         {
             "name": "Ryan Patel",
-            "image": "img/faces/Epic Financer3.jpg",
+            "image": "/img/faces/avatar-financer-3.webp",
             "role": "Small Business Owner",
             "text": "We needed a commercial vehicle quickly to keep jobs moving. Epic Finance moved fast, kept communication clear, and secured a solution that worked with our cashflow."
         },
         {
             "name": "Olivia Chen",
-            "image": "img/faces/Epic Financer4.jpg",
+            "image": "/img/faces/avatar-financer-4.webp",
             "role": "Family Car Upgrade",
             "text": "From the first call to final approval, everything was transparent and stress-free. We upgraded to a safer family vehicle with repayments that fit our monthly budget."
         },
         {
             "name": "Daniel Morgan",
-            "image": "img/faces/5.jpg",
+            "image": "/img/faces/avatar-5.webp",
             "role": "Fleet Operations Manager",
             "text": "Epic Finance helped us structure finance for multiple vehicles without overcomplicating things. Their practical advice and quick turnaround made a real difference to our operations."
         }

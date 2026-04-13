@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import Content from "../../data/sections/about.json";
 
@@ -9,14 +10,28 @@ const AboutSection = () => {
           <div className="row align-items-center justify-content-between">
             <div className="col-md-5 col-xl-5">
               <div className="mil-about-illustration mil-mb-60">
-                <div className="mil-image-frame">
-                  <img src={Content.image} alt={Content.title} />
+                <div className="mil-image-frame mil-about-main-photo">
+                  <Image
+                    src={Content.image}
+                    alt={Content.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 40vw"
+                    className="mil-about-fill-image"
+                    style={{ objectFit: "cover", objectPosition: "center" }}
+                  />
                 </div>
                 <div className="mil-window">
                   <ul className="mil-speakers">
                     {Content.speakers.map((item, key) => (
                     <li className="mil-speaker" key={`speaker-${key}`}>
-                      <img src={item.image} alt={item.alt} />
+                      <Image
+                        src={item.image}
+                        alt={item.alt}
+                        fill
+                        sizes="50px"
+                        className="mil-about-speaker-image"
+                        style={{ objectFit: "cover" }}
+                      />
                     </li>
                     ))}
                   </ul>

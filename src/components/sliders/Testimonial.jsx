@@ -1,4 +1,5 @@
 import { sliderProps } from "@/src/common/sliderProps";
+import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 import Content from '../../data/sliders/testimonial';
@@ -43,7 +44,7 @@ const Home1TestimonialSlider = () => {
           >
             <div className="mil-review">
               <div className="mil-stars mil-mb-30">
-                <img src="img/icons/sm/11.svg" alt="quote" />
+                <img src="/img/icons/sm/11.svg" alt="" width={40} height={40} />
                 <ul>
                   <li>
                     <i className="fas fa-star" />
@@ -66,7 +67,14 @@ const Home1TestimonialSlider = () => {
                 {item.text}
               </p>
               <div className="mil-author">
-                <img src={item.image} alt={item.name} />
+                <Image
+                  src={item.image}
+                  alt={item.name}
+                  width={110}
+                  height={110}
+                  sizes="55px"
+                  className="mil-testimonial-author-photo"
+                />
                 <div className="mil-name">
                   <h6 className="mil-mb-5">{item.name}</h6>
                   <span className="mil-text-sm">{item.role}</span>

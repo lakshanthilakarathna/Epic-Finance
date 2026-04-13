@@ -1,5 +1,6 @@
 import { sliderProps } from "@/src/common/sliderProps";
 import Link from "next/link";
+import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Content from "../../data/sliders/hero-slideshow.json";
 
@@ -11,16 +12,35 @@ const Home1BannerSlider = () => {
         className="swiper-container mil-banner-slideshow"
       >
         {Content.slides.map((slide, key) => (
-        <SwiperSlide className="swiper-slide" key={`slide-${key}`}>
-          <img
-            src={slide.image}
-            className="mil-background-image"
-            style={{ objectPosition: "center" }}
-            data-swiper-parallax={-100}
-            data-swiper-parallax-scale="1.1"
-            alt="image"
-          />
-        </SwiperSlide>
+          <SwiperSlide
+            className="swiper-slide"
+            key={`slide-${key}`}
+            style={{ position: "relative", minHeight: "100vh", height: "100%" }}
+          >
+            <div
+              className="mil-hero-parallax-wrap"
+              data-swiper-parallax="-100"
+              data-swiper-parallax-scale="1.1"
+              style={{
+                position: "absolute",
+                inset: 0,
+                width: "100%",
+                height: "100%",
+                minHeight: "100vh",
+              }}
+            >
+              <Image
+                src={slide.image}
+                alt=""
+                fill
+                className="mil-background-image"
+                style={{ objectFit: "cover", objectPosition: "center" }}
+                sizes="100vw"
+                priority={key === 0}
+                fetchPriority={key === 0 ? "high" : "low"}
+              />
+            </div>
+          </SwiperSlide>
         ))}
       </Swiper>
       <div className="mil-overlay" />

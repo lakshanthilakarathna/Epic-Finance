@@ -78,7 +78,7 @@ top panel
         height: 30px;
         display: flex;
         align-items: center;
-        background-image: url(../img/logo/logo-dark.png);
+        background-image: url(../img/logo/logo-dark.webp);
         background-position: center;
         background-repeat: no-repeat;
         background-size: contain;
@@ -325,7 +325,7 @@ top panel
         box-shadow: none;
 
         & .mil-logo {
-            background-image: url(../img/logo/logo-light.png);
+            background-image: url(../img/logo/logo-light.webp);
         }
 
         & .mil-navigation {
@@ -362,7 +362,7 @@ top panel
 
 
             & .mil-logo {
-                background-image: url(../img/logo/logo-dark.png);
+                background-image: url(../img/logo/logo-dark.webp);
             }
 
             & .mil-navigation {
@@ -3749,4 +3749,42 @@ additional pages
         display: flex;
         justify-content: space-between;
     }
+}
+
+/* next/image: fill layout inside existing aspect-ratio / circle frames */
+.mil-about-illustration .mil-image-frame > span {
+    position: absolute !important;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.mil-about-illustration .mil-image-frame .mil-about-fill-image {
+    filter: grayscale(100%);
+}
+
+.mil-about-illustration .mil-speaker > span {
+    position: absolute !important;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.mil-about-illustration .mil-speaker .mil-about-speaker-image {
+    filter: grayscale(100%);
+}
+
+.mil-reviews .mil-author .mil-testimonial-author-photo {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: $t-md;
+}
+
+.mil-reviews .swiper-slide:hover .mil-testimonial-author-photo {
+    filter: grayscale(0);
 }

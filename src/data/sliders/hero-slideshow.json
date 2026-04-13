@@ -14,13 +14,13 @@
     "description": "Simple, fast, and reliable financial services designed to help individuals and businesses move forward with confidence.",
     "slides": [
         {
-            "image": "img/photo/Epic Finance1.jpg"
+            "image": "/img/photo/hero-1.webp"
         },
         {
-            "image": "img/photo/Epic Finance2.JPG"
+            "image": "/img/photo/hero-2.webp"
         },
         {
-            "image": "img/photo/Epic Finance3.jpg"
+            "image": "/img/photo/hero-3.webp"
         }
     ],
     "stats": [

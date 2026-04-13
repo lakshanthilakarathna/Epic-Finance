@@ -47,7 +47,7 @@ const About = () => {
               <div className="mil-circle-illustration">
                 <div className="mil-circle-bg" />
                 <div className="mil-image-frame">
-                  <img src="img/faces/strong-team.jpg" alt="img" />
+                  <img src="/img/faces/strong-team.webp" alt="" width={960} height={960} />
                 </div>
               </div>
             </div>
@@ -102,7 +102,7 @@ const About = () => {
                 <div className="col-xl-5">
                   <Link href="/contact" className="mil-post-sm mil-mb-60">
                     <div className="mil-cover-frame">
-                      <img src="img/faces/Epic Financer1.jpg" alt="Epic Finance team" />
+                      <img src="/img/faces/avatar-financer-1.webp" alt="Epic Finance team" width={192} height={192} />
                     </div>
                     <div className="mil-description">
                       <h4 className="mil-font-3 mil-accent">Talk to us</h4>

@@ -33,6 +33,15 @@ jobs:
             --exclude .next \
             --exclude .env.local \
             --exclude .env.production \
+            --exclude 'public/img/photo/Epic Finance1.jpg' \
+            --exclude 'public/img/photo/Epic Finance2.JPG' \
+            --exclude 'public/img/photo/Epic Finance3.jpg' \
+            --exclude 'public/img/photo/Epic Finance8.jpg' \
+            --exclude 'public/img/faces/Epic Financer1.jpg' \
+            --exclude 'public/img/faces/Epic Financer2.jpg' \
+            --exclude 'public/img/faces/Epic Financer3.jpg' \
+            --exclude 'public/img/faces/Epic Financer4.jpg' \
+            --exclude 'public/img/faces/strong-team.jpg' \
             "${GITHUB_WORKSPACE}/" /var/www/epicfinance/
 
       - name: Install, build, restart

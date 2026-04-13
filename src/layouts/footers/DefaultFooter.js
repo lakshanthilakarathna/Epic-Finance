@@ -9,10 +9,12 @@ const DefaultFooter = () => {
           <div className="row justify-content-between align-items-center">
             <div className="col-xl-4 mil-mb-30">
               <img
-                src="img/logo/logo-light.png"
+                src="/img/logo/logo-light.webp"
+                width={560}
+                height={560}
                 alt="Epic Finance"
                 className="mil-logo mil-mb-30"
-                style={{ width: 140 }}
+                style={{ width: 140, height: "auto" }}
               />
               <p className="mil-light-soft mil-mb-30">
                 Epic Finance makes vehicle finance simple, fast, and transparent

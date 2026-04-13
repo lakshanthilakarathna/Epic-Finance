@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  images: {
+    formats: ["image/webp", "image/avif"],
+  },
   async redirects() {
     return [
       { source: "/service-1", destination: "/car-finance", permanent: true },
