@@ -2,6 +2,10 @@
 # sudo ln -s /etc/nginx/sites-available/epicfinance /etc/nginx/sites-enabled/
 # sudo nginx -t && sudo systemctl reload nginx
 # Then: sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
+#
+# 413 on /api/loan-application: Certbot often adds a second server { listen 443 ssl; ... }.
+# You MUST set client_max_body_size 20m; inside EVERY server block that proxies to Node
+# (port 80 and 443), then sudo nginx -t && sudo systemctl reload nginx.
 
 server {
     listen 80;

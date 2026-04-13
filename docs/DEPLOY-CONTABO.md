@@ -184,6 +184,8 @@ sudo certbot --nginx -d epicfinance.co.nz -d www.epicfinance.co.nz
 
 Follow the prompts. When done, open **https://epicfinance.co.nz** in a browser.
 
+**Loan application (413 Request Entity Too Large):** After Certbot, Nginx usually has a **`server { listen 443 ssl; ... }`** block. Add **`client_max_body_size 20m;`** inside that **HTTPS** block as well as the port **80** block (same line as in **`deploy/nginx-nextjs.conf.example`**), then **`sudo nginx -t && sudo systemctl reload nginx`**. If it is missing on **443**, uploads over ~1 MB fail before they reach Next.js.
+
 ---
 
 ## Part F — Checklist
