@@ -275,7 +275,7 @@ sudo -u deploy sh -c 'cat /home/deploy/.ssh/github_actions_deploy.pub >> /home/d
 sudo chmod 600 /home/deploy/.ssh/authorized_keys
 ```
 
-On the server, show the **private** key once and copy it into GitHub (**Settings → Secrets → Actions → `DEPLOY_SSH_KEY`**). Do not share it elsewhere; do not commit it to the repo.
+On the server, show the **private** key once and add it in GitHub under **Settings → Secrets and variables → Actions → Secrets** as **`DEPLOY_SSH_KEY`**. Paste the **full multiline** key exactly as printed (with line breaks). **Never** put the private key under **Variables** (it is not secret there and may be exposed). **Never** paste the private key in chat, email, or commits.
 
 ```bash
 sudo -u deploy cat /home/deploy/.ssh/github_actions_deploy
@@ -283,7 +283,7 @@ sudo -u deploy cat /home/deploy/.ssh/github_actions_deploy
 
 (If you prefer **`root`** for deploy SSH instead, generate under `/root/.ssh` and add the `.pub` line to `/root/.ssh/authorized_keys` instead.)
 
-2. Add repository secrets **`DEPLOY_HOST`** (VPS IP or hostname) and **`DEPLOY_USER`** (`deploy` or `root`).
+2. Add **Repository variables** (same settings page → **Variables** tab): **`DEPLOY_HOST`** (e.g. `173.212.208.181`) and **`DEPLOY_USER`** (`deploy` or `root`). The workflow reads these as `vars.*`; only **`DEPLOY_SSH_KEY`** uses **Secrets**.
 
 3. If **`DEPLOY_USER`** is `deploy`, allow a passwordless restart (as **root** on the VPS):
 
