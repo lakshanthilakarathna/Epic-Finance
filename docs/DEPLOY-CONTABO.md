@@ -93,10 +93,11 @@ rsync -avz \
   --exclude .next \
   --exclude .git \
   --exclude .env.local \
+  --exclude .env.production \
   ./ deploy@YOUR_SERVER_IP:/var/www/epicfinance/
 ```
 
-Use your real SSH user instead of `deploy` if different.
+Use your real SSH user instead of `deploy` if different. **`--exclude .env.production`** keeps the SMTP file that exists only on the VPS from being overwritten.
 
 ### Step 9 — Back on the VPS: production env (mail)
 
@@ -206,9 +207,24 @@ Check Zoho app password and **`/var/www/epicfinance/.env.production`** (variable
 
 ---
 
+## Quick deploy (after the first full setup)
+
+**A — From your Mac (manual):** run **Step 8** `rsync`, then SSH to the VPS and run:
+
+```bash
+cd /var/www/epicfinance
+npm ci
+npm run build
+sudo systemctl restart epicfinance-nextjs
+```
+
+**B — From GitHub (automatic):** add **Actions secrets** (**Part G, Step 18**), then **`git push` to `main`** or run **Actions → Deploy to Contabo → Run workflow**. The workflow file is **`.github/workflows/deploy-contabo.yml`**.
+
+---
+
 ## Later: update the site
 
-**Laptop:** run the same **Step 8** `rsync` again.
+**Laptop:** run the same **Step 8** `rsync` again (or use **GitHub Actions** if configured).
 
 **VPS:**
 
@@ -276,17 +292,9 @@ echo 'deploy ALL=(ALL) NOPASSWD: /bin/systemctl restart epicfinance-nextjs' > /e
 chmod 440 /etc/sudoers.d/epicfinance-deploy
 ```
 
-4. Copy the example workflow into the repo:
+4. The workflow file **`.github/workflows/deploy-contabo.yml`** is already in this repo. After secrets and sudo are set, push to **`main`** or use **Actions → Deploy to Contabo → Run workflow**.
 
-```bash
-mkdir -p .github/workflows
-cp deploy/github-actions-deploy.yml.example .github/workflows/deploy-contabo.yml
-git add .github/workflows/deploy-contabo.yml
-git commit -m "Add Contabo deploy workflow"
-git push
-```
-
-The workflow **rsyncs** the repo to **`/var/www/epicfinance`** and excludes **`.env.production`** so the file on the server is **not deleted**. Read the comments at the top of **[deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example)** for details.
+The workflow **rsyncs** the repo to **`/var/www/epicfinance`** and excludes **`.env.production`**. The **[deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example)** file is a duplicate reference copy.
 
 ---
 
@@ -298,4 +306,5 @@ The workflow **rsyncs** the repo to **`/var/www/epicfinance`** and excludes **`.
 | [deploy/epicfinance-nextjs.service](../deploy/epicfinance-nextjs.service) | systemd unit |
 | [deploy/nginx-nextjs.conf.example](../deploy/nginx-nextjs.conf.example) | Nginx reverse proxy |
 | [deploy/pm2.ecosystem.config.cjs.example](../deploy/pm2.ecosystem.config.cjs.example) | Optional PM2 instead of systemd |
-| [deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example) | Optional GitHub Actions → Contabo deploy |
+| [.github/workflows/deploy-contabo.yml](../.github/workflows/deploy-contabo.yml) | GitHub Actions → Contabo deploy (needs secrets) |
+| [deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example) | Same workflow, reference copy |
