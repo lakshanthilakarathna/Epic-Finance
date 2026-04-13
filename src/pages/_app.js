@@ -43,11 +43,6 @@ function MyApp({ Component, pageProps }) {
   return (
     <div className={fontRootClass}>
       <Head>
-        <title>Epic Finance | Vehicle Finance New Zealand</title>
-        <meta
-          name="description"
-          content="Epic Finance helps New Zealanders access fair, flexible vehicle finance with fast decisions and trusted support."
-        />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <DeferredPluginStyles />

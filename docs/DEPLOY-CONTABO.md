@@ -101,7 +101,7 @@ Use your real SSH user instead of `deploy` if different. **`--exclude .env.produ
 
 ### Step 9 — Back on the VPS: production env (mail)
 
-Next and the mail helpers load **`/var/www/epicfinance/.env.production`** at build and runtime. The systemd unit also references that path via **`EnvironmentFile=`** so the running process inherits **`SMTP_*`** even if in-app loading misbehaves. Optional: set **`SMTP_ENV_FILE`** to another path (see **`deploy/epicfinance.env.example`**).
+Next and the mail helpers load **`/var/www/epicfinance/.env.production`** at build and runtime. The systemd unit also references that path via **`EnvironmentFile=`** so the running process inherits **`SMTP_*`** even if in-app loading misbehaves. Optional: set **`SMTP_ENV_FILE`** to another path (see **`deploy/epicfinance.env.example`**). For **SEO** (canonical and Open Graph URLs), you can set **`NEXT_PUBLIC_SITE_URL=https://epicfinance.co.nz`** in the same file before **`npm run build`**; omit on production if the default domain is correct.
 
 ```bash
 cd /var/www/epicfinance

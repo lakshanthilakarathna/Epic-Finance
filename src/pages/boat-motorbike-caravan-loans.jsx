@@ -54,7 +54,7 @@ const faqs = [
 
 const Service2 = () => {
   return (
-    <Layouts footer={1}>
+    <Layouts footer={1} faqSchema={faqs}>
       <PageBanner pageName={"Service"} pageTitle={"Boat, Motorbike & Caravan Loans"} />
 
       <section className="mil-p-120-90">

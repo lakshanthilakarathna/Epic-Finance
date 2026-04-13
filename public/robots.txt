@@ -1,0 +1,5 @@
+# Keep Sitemap URL in sync with production domain (see NEXT_PUBLIC_SITE_URL).
+User-agent: *
+Allow: /
+
+Sitemap: https://epicfinance.co.nz/sitemap.xml

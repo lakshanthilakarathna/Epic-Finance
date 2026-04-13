@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { accordion, milButtonClick, milButtonClick2 } from "@/src/common/utilits";
+import SeoHead from "@/src/components/SeoHead";
 import Footer from "./footers/Index";
 import Header from "./headers/Index";
 
@@ -12,6 +13,8 @@ const Layouts = ({
   transparent,
   headerTop,
   extarClass,
+  faqSchema,
+  noIndex,
 }) => {
   useEffect(() => {
     milButtonClick();
@@ -21,6 +24,7 @@ const Layouts = ({
 
   return (
     <div className="mil-wrapper">
+      <SeoHead faqItems={faqSchema} noIndex={noIndex} />
       {!noHeader && (
         <Header
           header={header}

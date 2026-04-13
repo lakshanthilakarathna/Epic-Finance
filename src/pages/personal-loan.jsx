@@ -54,7 +54,7 @@ const faqs = [
 
 const Service4 = () => {
   return (
-    <Layouts footer={1}>
+    <Layouts footer={1} faqSchema={faqs}>
       <PageBanner pageName={"Service"} pageTitle={"Personal Loan"} />
 
       <section className="mil-p-120-90">

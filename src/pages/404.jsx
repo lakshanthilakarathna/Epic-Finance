@@ -2,7 +2,7 @@ import Layouts from "@/src/layouts/Layouts";
 import Link from "next/link";
 const E404 = () => {
   return (
-    <Layouts noFooter transparent>
+    <Layouts noFooter transparent noIndex>
       {/* 404 */}
       <div className="mil-dark-bg mil-add-page">
         <div
