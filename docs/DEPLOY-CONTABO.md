@@ -296,6 +296,8 @@ chmod 440 /etc/sudoers.d/epicfinance-deploy
 
 The workflow **rsyncs** the repo to **`/var/www/epicfinance`** and excludes **`.env.production`**. The **[deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example)** file is a duplicate reference copy.
 
+If Actions fails on **Probe IPv4 TCP port 22** or **Test SSH** (often after ~20–30s): GitHub’s runners must reach your VPS on **SSH port 22**. On the server run **`sudo ufw allow OpenSSH`** (or **`sudo ufw allow 22/tcp`**) and **`sudo ufw reload`**. In the **Contabo** control panel, check any **firewall / security group** so **TCP 22** is allowed from the internet.
+
 ---
 
 ## Files in this repo
