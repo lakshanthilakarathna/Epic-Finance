@@ -8,7 +8,6 @@ import HowItWorksSection from "../components/sections/HowItWorks";
 import ContactSection from "../components/sections/Contact";
 import Divider from "../components/sections/Divider";
 import HeroSlideshowSlider from "../components/sliders/HeroSlideshow";
-import TestimonialSlider from "../components/sliders/Testimonial";
 
 const Home1 = () => {
   return (
@@ -23,7 +22,6 @@ const Home1 = () => {
       <Divider />
       <HowItWorksSection />
       <Divider />
-      <TestimonialSlider />
       <ContactSection />
     </Layouts>
   );

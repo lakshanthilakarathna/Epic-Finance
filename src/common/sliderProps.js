@@ -92,24 +92,6 @@ export const sliderProps = {
       nextEl: ".mil-banner-next",
     },
   },
-  milReviSlider2: {
-    slidesPerView: 1,
-    spaceBetween: 30,
-    speed: 800,
-    autoplay: {
-      delay: 5000,
-    },
-    loop: true,
-    navigation: {
-      prevEl: ".mil-revi-prev",
-      nextEl: ".mil-revi-next",
-    },
-    breakpoints: {
-      768: {
-        slidesPerView: 2,
-      },
-    },
-  },
   milBoxSlider: {
     slidesPerView: 1,
     spaceBetween: 30,
@@ -157,23 +139,6 @@ export const sliderProps = {
     navigation: {
       prevEl: ".mil-box-prev",
       nextEl: ".mil-box-next",
-    },
-  },
-  milReviSlider: {
-    slidesPerView: 1,
-    spaceBetween: 30,
-    speed: 800,
-    navigation: {
-      prevEl: ".mil-revi-prev",
-      nextEl: ".mil-revi-next",
-    },
-    breakpoints: {
-      768: {
-        slidesPerView: 2,
-      },
-      992: {
-        slidesPerView: 3,
-      },
     },
   },
   milEventsSlider: {
