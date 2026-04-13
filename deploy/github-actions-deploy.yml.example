@@ -1,5 +1,9 @@
-# Copy to .github/workflows/deploy-contabo.yml — see docs/DEPLOY-CONTABO.md Part G
-
+# Requires (Settings → Secrets and variables → Actions):
+#   Secret:  DEPLOY_SSH_KEY (full multiline private key — run: ssh-keygen -y -f keyfile to test locally)
+#   Variables and/or Secrets: DEPLOY_HOST, DEPLOY_USER
+# If still failing: open run log — note which step is red (Probe vs Validate key vs Test SSH).
+# Contabo may block datacenter IPs; if Probe passes but SSH fails, try a self-hosted runner on the VPS.
+# See docs/DEPLOY-CONTABO.md Part G
 name: Deploy to Contabo
 
 on:
@@ -21,45 +25,73 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Check DEPLOY_HOST and DEPLOY_USER are set
+      - name: Check and normalize DEPLOY_HOST / DEPLOY_USER
         run: |
-          if [ -z "$DEPLOY_HOST" ] || [ -z "$DEPLOY_USER" ]; then
-            echo "::error::Set DEPLOY_HOST and DEPLOY_USER (Variables or Secrets)."
+          if [ -z "${DEPLOY_HOST:-}" ] || [ -z "${DEPLOY_USER:-}" ]; then
+            echo "::error::DEPLOY_HOST or DEPLOY_USER is empty (Variables or Secrets)."
             exit 1
           fi
+          H=$(printf '%s' "${DEPLOY_HOST}" | tr -d '\r\n\t ')
+          U=$(printf '%s' "${DEPLOY_USER}" | tr -d '\r\n\t ')
+          if [ -z "$H" ] || [ -z "$U" ]; then
+            echo "::error::Host or user became empty after trimming whitespace."
+            exit 1
+          fi
+          {
+            echo "DEPLOY_HOST=$H"
+            echo "DEPLOY_USER=$U"
+          } >> "$GITHUB_ENV"
+          echo "Deploy target: ${U}@${H}:${DEPLOY_PATH}"
 
       - name: Probe IPv4 TCP port 22 (firewall check)
         run: |
-          if ! timeout 12 bash -c "echo >/dev/tcp/${DEPLOY_HOST}/22" 2>/dev/null; then
-            echo "::error::Cannot reach port 22 — check UFW and Contabo firewall."
+          set +e
+          timeout 15 bash -c "echo >/dev/tcp/${DEPLOY_HOST}/22" 2>/dev/null
+          ok=$?
+          set -e
+          if [ "$ok" -ne 0 ]; then
+            echo "::error::Cannot reach ${DEPLOY_HOST}:22 from GitHub. Check Contabo panel firewall, UFW (sudo ufw status), and whether your provider blocks cloud/datacenter IPs."
             exit 1
           fi
+          echo "Port 22 is reachable (IPv4)."
 
       - name: Add SSH key and known_hosts
         run: |
-          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
           timeout 25 ssh-keyscan -4 -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
 
-      - name: Test SSH
+      - name: Validate DEPLOY_SSH_KEY is a usable private key
         run: |
-          ssh -4 -i "$HOME/.ssh/deploy_key" \
-            -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
-            "${DEPLOY_USER}@${DEPLOY_HOST}" "echo ok"
+          if ! ssh-keygen -y -f "$HOME/.ssh/deploy_key" >/dev/null 2>&1; then
+            echo "::error::DEPLOY_SSH_KEY is not a valid OpenSSH private key. On the VPS run: cat /root/.ssh/github_actions_deploy — paste that entire multiline block into the GitHub secret (no spaces spliced into the middle lines)."
+            exit 1
+          fi
+
+      - name: Test SSH (passwordless key must work)
+        run: |
+          set -x
+          ssh -v -4 -i "$HOME/.ssh/deploy_key" \
+            -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=30 \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" "echo ssh_ok"
 
       - name: Ensure deploy directory exists on VPS
         run: |
           ssh -4 -i "$HOME/.ssh/deploy_key" \
-            -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20 \
+            -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=30 \
             "${DEPLOY_USER}@${DEPLOY_HOST}" "mkdir -p '${DEPLOY_PATH}'"
 
       - name: Rsync to VPS
         run: |
           rsync -avz \
-            --exclude node_modules --exclude .next --exclude .git \
-            --exclude .env.local --exclude .env.production \
-            -e "ssh -4 -i \"$HOME/.ssh/deploy_key\" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=20" \
+            --exclude node_modules \
+            --exclude .next \
+            --exclude .git \
+            --exclude .env.local \
+            --exclude .env.production \
+            -e "ssh -4 -i \"$HOME/.ssh/deploy_key\" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=30" \
             ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
       - name: Install, build, restart
@@ -69,7 +101,7 @@ jobs:
           username: ${{ env.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           port: 22
-          timeout: 30s
+          timeout: 60s
           command_timeout: 20m
           script_stop: true
           script: |

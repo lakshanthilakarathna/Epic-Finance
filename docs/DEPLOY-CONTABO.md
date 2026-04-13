@@ -296,7 +296,9 @@ chmod 440 /etc/sudoers.d/epicfinance-deploy
 
 The workflow **rsyncs** the repo to **`/var/www/epicfinance`** and excludes **`.env.production`**. The **[deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example)** file is a duplicate reference copy.
 
-If Actions fails on **Probe IPv4 TCP port 22** or **Test SSH** (often after ~20–30s): GitHub’s runners must reach your VPS on **SSH port 22**. On the server run **`sudo ufw allow OpenSSH`** (or **`sudo ufw allow 22/tcp`**) and **`sudo ufw reload`**. In the **Contabo** control panel, check any **firewall / security group** so **TCP 22** is allowed from the internet.
+If Actions fails on **Probe IPv4 TCP port 22** or **Test SSH** (often after ~20–30s): GitHub’s runners must reach your VPS on **SSH port 22**. On the server run **`sudo ufw allow OpenSSH`** (or **`sudo ufw allow 22/tcp`**) and **`sudo ufw enable`** if you use UFW. In the **Contabo** control panel, check any **firewall** so **TCP 22** is allowed from the internet. Some providers block **datacenter / Azure** source IPs (GitHub Actions runs on Azure): if the **Probe** step always fails while your home PC can SSH, ask Contabo support or use a **[self-hosted Actions runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)** on the VPS (deploy then runs locally, no inbound SSH from GitHub needed).
+
+If **Validate DEPLOY_SSH_KEY** fails, the secret is corrupted (often single-line paste with spaces). Re-paste the full multiline key from **`cat /root/.ssh/github_actions_deploy`** on the server.
 
 ---
 
