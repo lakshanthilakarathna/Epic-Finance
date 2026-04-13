@@ -1,0 +1,45 @@
+# Deploy without inbound SSH from GitHub (fixes Probe/Test SSH failing when cloud IPs are blocked).
+#
+# Setup (on the VPS, as the user that will run the runner — often root or deploy):
+#   1. Repo → Settings → Actions → Runners → New self-hosted runner
+#   2. Follow "Download" + "Configure" for Linux x64; install under e.g. /home/deploy/actions-runner
+#   3. sudo ./svc.sh install && sudo ./svc.sh start
+#
+# Runner needs: Node/npm, read/write /var/www/epicfinance, sudo for systemctl (see below).
+#
+# After the runner is online and a manual run succeeds: add to `on:` below:
+#   push:
+#     branches: [main]
+# Then disable workflow "Deploy to Contabo" (SSH) in Actions → … so only this job runs.
+
+name: Deploy to Contabo (self-hosted)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Sync to /var/www/epicfinance
+        run: |
+          rsync -av \
+            --delete \
+            --exclude .git \
+            --exclude node_modules \
+            --exclude .next \
+            --exclude .env.local \
+            --exclude .env.production \
+            "${GITHUB_WORKSPACE}/" /var/www/epicfinance/
+
+      - name: Install, build, restart
+        working-directory: /var/www/epicfinance
+        run: |
+          npm ci
+          npm run build
+          sudo systemctl restart epicfinance-nextjs

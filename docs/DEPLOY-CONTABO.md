@@ -300,6 +300,15 @@ If Actions fails on **Probe IPv4 TCP port 22** or **Test SSH** (often after ~20�
 
 If **Validate DEPLOY_SSH_KEY** fails, the secret is corrupted (often single-line paste with spaces). Re-paste the full multiline key from **`cat /root/.ssh/github_actions_deploy`** on the server.
 
+### Step 19 — Self-hosted runner (when SSH from GitHub always fails)
+
+If **Probe** or **Test SSH** never succeeds from **ubuntu-latest** but your **Mac can SSH**, your provider may be **blocking datacenter/Azure IPs**. Use a **[self-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)** on the VPS so the job runs **on the server** (outbound HTTPS to GitHub only; **no inbound SSH from GitHub**).
+
+1. On the VPS: install Node.js if needed (same as Part B). Ensure **`/var/www/epicfinance`** exists and the runner user can write it.
+2. GitHub: **Settings → Actions → Runners → New self-hosted runner** — choose **Linux** / **x64**, follow the download and **`./config.sh`** steps. Install as a service (**`./svc.sh install`** then **`./svc.sh start`**).
+3. If the runner user is not **root**, allow **`sudo systemctl restart epicfinance-nextjs`** without a password (same idea as Step 18, sudoers snippet for that user).
+4. **Actions → Deploy to Contabo (self-hosted) → Run workflow**. When it goes green, you can edit **`.github/workflows/deploy-contabo-selfhosted.yml`** to add **`push: branches: [main]`** under **`on:`**, and **disable** the workflow **Deploy to Contabo** (the SSH one) so pushes do not keep failing.
+
 ---
 
 ## Files in this repo
@@ -310,5 +319,6 @@ If **Validate DEPLOY_SSH_KEY** fails, the secret is corrupted (often single-line
 | [deploy/epicfinance-nextjs.service](../deploy/epicfinance-nextjs.service) | systemd unit |
 | [deploy/nginx-nextjs.conf.example](../deploy/nginx-nextjs.conf.example) | Nginx reverse proxy |
 | [deploy/pm2.ecosystem.config.cjs.example](../deploy/pm2.ecosystem.config.cjs.example) | Optional PM2 instead of systemd |
-| [.github/workflows/deploy-contabo.yml](../.github/workflows/deploy-contabo.yml) | GitHub Actions → Contabo deploy (needs secrets) |
-| [deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example) | Same workflow, reference copy |
+| [.github/workflows/deploy-contabo.yml](../.github/workflows/deploy-contabo.yml) | GitHub Actions → Contabo via SSH (needs secrets + reachable port 22) |
+| [.github/workflows/deploy-contabo-selfhosted.yml](../.github/workflows/deploy-contabo-selfhosted.yml) | Deploy from a runner **on the VPS** (no inbound SSH from GitHub) |
+| [deploy/github-actions-deploy.yml.example](../deploy/github-actions-deploy.yml.example) | Copy of SSH-based workflow |
