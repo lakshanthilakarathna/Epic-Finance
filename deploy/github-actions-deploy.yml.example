@@ -1,10 +1,7 @@
-# Copy to .github/workflows/deploy-contabo.yml
+# Copy to .github/workflows/deploy-contabo.yml — see docs/DEPLOY-CONTABO.md Part G
 #
-# Settings → Secrets and variables → Actions:
-#   Secrets:  DEPLOY_SSH_KEY (private key, multiline)
-#   Variables OR Secrets: DEPLOY_HOST, DEPLOY_USER (workflow uses vars || secrets)
-#
-# See docs/DEPLOY-CONTABO.md Part G.
+# Secrets: DEPLOY_SSH_KEY
+# Variables and/or Secrets: DEPLOY_HOST, DEPLOY_USER (workflow: vars || secrets)
 
 name: Deploy to Contabo
 
@@ -12,6 +9,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   deploy:
@@ -24,12 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fail if DEPLOY_SSH_KEY secret is missing
-        if: ${{ secrets.DEPLOY_SSH_KEY == '' }}
-        run: |
-          echo "::error::Add repository secret DEPLOY_SSH_KEY"
-          exit 1
-
       - name: Check DEPLOY_HOST and DEPLOY_USER are set
         run: |
           if [ -z "$DEPLOY_HOST" ]; then
@@ -41,12 +35,23 @@ jobs:
             exit 1
           fi
 
-      - name: Add SSH key
+      - name: Add SSH key and known_hosts
         run: |
           mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
           printf '%s\n' "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+
+      - name: Test SSH
+        run: |
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=30 \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" "echo ssh_ok"
+
+      - name: Ensure deploy directory exists on VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" "mkdir -p '${DEPLOY_PATH}'"
 
       - name: Rsync to VPS
         run: |
@@ -56,7 +61,7 @@ jobs:
             --exclude .git \
             --exclude .env.local \
             --exclude .env.production \
-            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes" \
+            -e "ssh -i ~/.ssh/deploy_key -o IdentitiesOnly=yes -o BatchMode=yes" \
             ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
       - name: Install, build, restart
@@ -65,6 +70,7 @@ jobs:
           host: ${{ env.DEPLOY_HOST }}
           username: ${{ env.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 20m
           script_stop: true
           script: |
             cd ${{ env.DEPLOY_PATH }}
