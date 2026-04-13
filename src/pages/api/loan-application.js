@@ -81,7 +81,7 @@ export default async function handler(req, res) {
   }
 
   if (!getSmtpContext()) {
-    console.error("loan-application api: SMTP environment variables are not configured");
+    console.error("loan-application api: MAIL_SMTP_NOT_CONFIGURED");
     return res.status(500).json({
       error: "Unable to send application. Please try again later.",
       code: "MAIL_SMTP_NOT_CONFIGURED",

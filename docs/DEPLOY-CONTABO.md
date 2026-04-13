@@ -101,7 +101,7 @@ Use your real SSH user instead of `deploy` if different. **`--exclude .env.produ
 
 ### Step 9 — Back on the VPS: production env (mail)
 
-Next loads **`/var/www/epicfinance/.env.production`** at build and runtime (no `/etc/epicfinance.env` required).
+Next and the mail helpers load **`/var/www/epicfinance/.env.production`** at build and runtime. The systemd unit also references that path via **`EnvironmentFile=`** so the running process inherits **`SMTP_*`** even if in-app loading misbehaves. Optional: set **`SMTP_ENV_FILE`** to another path (see **`deploy/epicfinance.env.example`**).
 
 ```bash
 cd /var/www/epicfinance
@@ -137,7 +137,7 @@ sudo cp /var/www/epicfinance/deploy/epicfinance-nextjs.service /etc/systemd/syst
 sudo nano /etc/systemd/system/epicfinance-nextjs.service
 ```
 
-Set **`User=`** and **`Group=`** to `deploy` (or your user). Set **`WorkingDirectory=`** to `/var/www/epicfinance`. The unit uses **`ExecStart=.../node .../next start`** (not `npm`); if **`/usr/bin/node`** is wrong on your server, run `readlink -f $(which node)` as root and put that path in **`ExecStart=`**. Save.
+Set **`User=`** and **`Group=`** to `deploy` (or your user). Set **`WorkingDirectory=`** to `/var/www/epicfinance`. The unit includes **`EnvironmentFile=-/var/www/epicfinance/.env.production`** so SMTP variables are loaded by systemd before Node starts (optional; the `-` prefix ignores a missing file). The unit uses **`ExecStart=.../node .../next start`** (not `npm`); if **`/usr/bin/node`** is wrong on your server, run `readlink -f $(which node)` as root and put that path in **`ExecStart=`**. Save.
 
 ```bash
 sudo systemctl daemon-reload
@@ -203,7 +203,17 @@ If mail fails:
 sudo journalctl -u epicfinance-nextjs -n 120 --no-pager
 ```
 
-Look for **`SMTP environment variables are not configured`**, **`smtp: sendMail failed`** (with `responseCode`), or **`smtp: message accepted`** (with `messageId` — proves the provider accepted the message). Check Zoho **app-specific password** and **`/var/www/epicfinance/.env.production`**. After editing `.env.production`, run **`sudo systemctl restart epicfinance-nextjs`** (no rebuild required for SMTP-only changes).
+Look for **`smtp: MAIL_SMTP_NOT_CONFIGURED`** (JSON in logs shows **`hasHost` / `hasUser` / `hasPass`** — booleans only, no secrets), **`smtp: sendMail failed`** (with `responseCode`), or **`smtp: message accepted`** (with `messageId` — proves the provider accepted the message). Check Zoho **app-specific password** and **`/var/www/epicfinance/.env.production`**. After editing `.env.production`, run **`sudo systemctl daemon-reload`** if you changed the unit file, then **`sudo systemctl restart epicfinance-nextjs`** (no rebuild required for SMTP-only changes).
+
+#### Verify SMTP env (without printing secrets)
+
+**`systemctl show epicfinance-nextjs -p Environment`** does not list variables from **`EnvironmentFile=`**; use logs or a one-off check as **`deploy`**:
+
+```bash
+sudo -u deploy -H bash -lc 'cd /var/www/epicfinance && node -e "require(\"dotenv\").config({path:\".env.production\",override:true}); console.log(\"SMTP_PASS set:\", Boolean(process.env.SMTP_PASS && process.env.SMTP_PASS.trim()));"'
+```
+
+You should see **`SMTP_PASS set: true`** after filling the file. **`sudo systemctl restart epicfinance-nextjs`** after any change.
 
 #### Troubleshooting form email (quick)
 
@@ -242,9 +252,9 @@ The **Deploy to Contabo** workflow runs **`npm ci`** and **`npm run build`** on 
 
 ### Forms (email via SMTP)
 
-The site sends **contact**, **complaints**, and **loan application** submissions through **`/api/contact`**, **`/api/complaints`**, and **`/api/loan-application`** (same **`next start`** process). All need **`SMTP_*`** in **`.env.production`**. Optional: **`COMPLAINTS_TO`** and **`LOAN_APPLICATION_TO`** to route mail to different addresses (see **`deploy/epicfinance.env.example`**); otherwise **`CONTACT_TO`** is used.
+The site sends **contact**, **complaints**, and **loan application** submissions through **`/api/contact`**, **`/api/complaints`**, and **`/api/loan-application`** (same **`next start`** process). All need **`SMTP_*`** in **`.env.production`**. Optional: **`SMTP_FROM`** (display name + address), **`COMPLAINTS_TO`**, and **`LOAN_APPLICATION_TO`** — see **`deploy/epicfinance.env.example`**; default **`From`** is **`SMTP_USER`** and inbound default is **`CONTACT_TO`**.
 
-The app loads **`.env.production`** from the server app directory via Next’s **`loadEnvConfig`** when mail runs, so **`WorkingDirectory`** in systemd must stay **`/var/www/epicfinance`**. After creating or editing **`.env.production`**, run **`sudo systemctl restart epicfinance-nextjs`**. Deploy logs warn if **`.env.production`** is missing.
+The app loads **`.env.production`** via **`loadEnvConfig`** and **`dotenv`** when mail runs; systemd **`EnvironmentFile=`** also injects the same file. **`WorkingDirectory`** must stay **`/var/www/epicfinance`**. After creating or editing **`.env.production`**, run **`sudo systemctl restart epicfinance-nextjs`**. Deploy logs warn if **`.env.production`** is missing.
 
 ---
 

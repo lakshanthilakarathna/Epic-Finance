@@ -70,7 +70,7 @@ export default async function handler(req, res) {
   }
 
   if (!getSmtpContext()) {
-    console.error("complaints api: SMTP environment variables are not configured");
+    console.error("complaints api: MAIL_SMTP_NOT_CONFIGURED");
     return res.status(500).json({
       error: "Unable to send message. Please try again later.",
       code: "MAIL_SMTP_NOT_CONFIGURED",
