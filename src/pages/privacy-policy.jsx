@@ -59,10 +59,12 @@ const PrivacyPolicyPage = () => {
                 If you have any questions about this Privacy Policy, please contact us at:
               </p>
               <p className="mil-mb-10">
-                <strong>Email:</strong> hello@epicfinance.co.nz
+                <strong>Email:</strong>{" "}
+                <a href="mailto:info@epicfinance.co.nz">info@epicfinance.co.nz</a>
               </p>
               <p className="mil-mb-10">
-                <strong>Phone:</strong> +64 800 070 404
+                <strong>Phone:</strong>{" "}
+                <a href="tel:+64228548221">+64 22 854 8221</a>
               </p>
               <p className="mil-mb-30">
                 <strong>Address:</strong> Auckland, New Zealand
