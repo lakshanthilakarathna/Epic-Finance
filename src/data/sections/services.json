@@ -1,0 +1,43 @@
+{
+    "title": {"first": "How We Can", "second": "Help You"},
+    "column1": {
+        "heading": "Personal Finance",
+        "items": [
+            {
+                "num": "01",
+                "name": "Car Finance",
+                "icon": "img/icons/md/1.svg",
+                "text": "Drive away with confidence, with flexible car leasing and loan options tailored to your budget and lifestyle."
+            },
+            {
+                "num": "02",
+                "name": "Boat, Motorbike & Caravan Loans",
+                "icon": "img/icons/md/2.svg",
+                "text": "From boats to bikes to caravans, we make financing your next adventure simple and stress-free."
+            },
+            {
+                "num": "03",
+                "name": "Personal Loan",
+                "icon": "img/icons/md/3.svg",
+                "text": "Whether planned or unexpected, we make personal loans easier to access with clear terms and no unnecessary fuss."
+            }
+        ]
+    },
+    "column2": {
+        "heading": "Business & Support",
+        "items": [
+            {
+                "num": "04",
+                "name": "Commercial Vehicle Loan",
+                "icon": "img/icons/md/4.svg",
+                "text": "Get the right vehicles for your business with simple, affordable finance solutions tailored to daily operations."
+            },
+            {
+                "num": "05",
+                "name": "Debt Consolidation Loans",
+                "icon": "img/icons/md/5.svg",
+                "text": "Combine multiple debts into one manageable repayment to reduce stress and improve control over your finances."
+            }
+        ]
+    }
+}

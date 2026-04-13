@@ -1,0 +1,11 @@
+{
+    "title": {
+        "first": "Calculate",
+        "second": "Your Loan"
+    },
+    "description": "Estimate repayments in seconds. Adjust amount, rate, and term to explore options that suit your budget before you apply.",
+    "button": {
+        "label": "Open full calculator",
+        "link": "/loan-calculator"
+    }
+}

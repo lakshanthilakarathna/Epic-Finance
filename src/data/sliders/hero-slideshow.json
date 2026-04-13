@@ -1,0 +1,49 @@
+{
+    "title": {
+        "first": "WE PROVIDE FINANCIAL <br />SOLUTIONS AND SUPPORT",
+        "second": "To New Zealanders"
+    },
+    "subtitle": {
+        "first": "The Future",
+        "second": "of Finance"
+    },
+    "button": {
+        "label": "Apply Now",
+        "link": "/loan-application"
+    },
+    "description": "Simple, fast, and reliable financial services designed to help individuals and businesses move forward with confidence.",
+    "slides": [
+        {
+            "image": "img/photo/Epic Finance1.jpg"
+        },
+        {
+            "image": "img/photo/Epic Finance2.JPG"
+        },
+        {
+            "image": "img/photo/Epic Finance3.jpg"
+        }
+    ],
+    "stats": [
+        {
+            "number": "500+",
+            "label": "Loans Approved"
+        }
+    ],
+    "items": [
+        {
+            "label": "Fast Loan Approvals",
+            "title": "Speed",
+            "text": "Quick assessments and faster decisions so you can access finance when it matters most."
+        },
+        {
+            "label": "Flexible Repayment Plans",
+            "title": "Flexibility",
+            "text": "Repayment options tailored to your cash flow, goals, and financial priorities."
+        },
+        {
+            "label": "Trusted NZ Support",
+            "title": "Local Support",
+            "text": "Dedicated New Zealand-based guidance from application through to repayment."
+        }
+    ]
+}

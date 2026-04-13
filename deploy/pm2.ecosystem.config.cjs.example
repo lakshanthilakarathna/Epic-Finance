@@ -1,0 +1,25 @@
+/**
+ * Optional: PM2 instead of systemd.
+ * npm install -g pm2
+ * Copy to ecosystem.config.cjs, set cwd, and add SMTP_* / CONTACT_TO under env
+ * (or place .env.production in cwd — Next loads it when NODE_ENV=production).
+ * pm2 start ecosystem.config.cjs && pm2 save && pm2 startup
+ */
+module.exports = {
+  apps: [
+    {
+      name: "epicfinance-next",
+      cwd: "/var/www/epicfinance",
+      script: "npm",
+      args: "run start",
+      env: {
+        NODE_ENV: "production",
+        // SMTP_HOST: "smtppro.zoho.com",
+        // SMTP_PORT: "465",
+        // SMTP_USER: "",
+        // SMTP_PASS: "",
+        // CONTACT_TO: "",
+      },
+    },
+  ],
+};

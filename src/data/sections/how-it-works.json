@@ -1,0 +1,41 @@
+{
+    "subtitle": "",
+    "title": { "first": "Why Choose", "second": "Epic Finance", "third": "?" },
+    "intro": "We're more than just a finance company. We're your partners in achieving financial success.",
+    "items": [
+        {
+            "name": "Fast, No-Fuss Process",
+            "icon": "/img/icons/sm/1.svg",
+            "text": "We keep things simple. No endless paperwork, no confusion, just a smooth and honest process that respects your time and gets results quickly."
+        },
+        {
+            "name": "Honest Rates, Real Value",
+            "icon": "/img/icons/sm/2.svg",
+            "text": "We don't overcomplicate things. You'll always know what you're signing up for, with fair, transparent rates that match your reality, not just the fine print."
+        },
+        {
+            "name": "Guidance You Can Trust",
+            "icon": "/img/icons/sm/3.svg",
+            "text": "We're not here to sell, we're here to support. From start to finish, our team listens to your needs and helps you make confident decisions with clarity and care."
+        },
+        {
+            "name": "Support That Sticks Around",
+            "icon": "/img/icons/sm/4.svg",
+            "text": "Getting approved is just the beginning. We're by your side for the long haul, ready to help if things change, go wrong, or need adjusting along the way."
+        },
+        {
+            "name": "Finance From Anywhere",
+            "icon": "/img/icons/sm/5.svg",
+            "text": "You shouldn't have to rearrange your life to sort out your loan. With digital support from start to finish, you can apply and manage your finance anytime, anywhere."
+        },
+        {
+            "name": "Local and Reliable",
+            "icon": "/img/icons/sm/6.svg",
+            "text": "Proudly based in New Zealand. Owned and Managed by a Kiwi."
+        }
+    ],
+    "button2": {
+        "label": "Learn More",
+        "link": "/about"
+    }
+}

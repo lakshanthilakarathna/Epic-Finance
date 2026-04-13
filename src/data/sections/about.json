@@ -1,0 +1,30 @@
+{
+    "image": "img/photo/Epic Finance8.jpg",
+    "title": "How We Collaborate With You",
+    "subtitle": "About us",
+    "text": "At Epic Finance, we make it simple for people across New Zealand to access the finance they need, regardless of background, visa status, or financial situation. Whether you are a citizen, resident, student, or on a work visa, we are here to help you move forward with confidence.",
+    "text2": "We specialise in vehicle finance and work with a strong network of trusted lenders across New Zealand so you get flexible solutions, competitive rates, and options tailored to your lifestyle without the stress of searching on your own. Epic Finance - Your journey, your choice, your way.",
+    "list": [],
+    "rating": {
+        "label": "Trusted by Kiwis nationwide",
+        "value": "4.9"
+    },
+    "speakers": [
+        {
+            "image": "img/faces/Epic Financer1.jpg",
+            "alt": "Epic Finance client"
+        },
+        {
+            "image": "img/faces/Epic Financer2.jpg",
+            "alt": "Epic Finance client"
+        },
+        {
+            "image": "img/faces/Epic Financer3.jpg",
+            "alt": "Epic Finance client"
+        },
+        {
+            "image": "img/faces/Epic Financer4.jpg",
+            "alt": "Epic Finance client"
+        }
+    ]
+}
