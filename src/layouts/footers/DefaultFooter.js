@@ -99,6 +99,9 @@ const DefaultFooter = () => {
               <a href="/privacy-policy">Privacy Policy</a>
             </li>
             <li>
+              <Link href="/complaints-feedback">Complaints &amp; feedback</Link>
+            </li>
+            <li>
               <Link href="/sitemap">Sitemap</Link>
             </li>
           </ul>
