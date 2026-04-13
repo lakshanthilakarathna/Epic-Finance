@@ -300,6 +300,8 @@ If Actions fails on **Probe IPv4 TCP port 22** or **Test SSH** (often after ~20â
 
 If **Validate DEPLOY_SSH_KEY** fails, the secret is corrupted (often single-line paste with spaces). Re-paste the full multiline key from **`cat /root/.ssh/github_actions_deploy`** on the server.
 
+If the SSH workflow passes **Rsync** but fails with **`npm: command not found`** on the server: install Node.js on the VPS (**Part B, Step 4**). The workflow runs **`bash -lc`** so **`npm`** is picked up from a normal login **`PATH`** (e.g. NodeSource under **`/usr/bin`**).
+
 ### Step 19 â€” Self-hosted runner (when SSH from GitHub always fails)
 
 If **Probe** or **Test SSH** never succeeds from **ubuntu-latest** but your **Mac can SSH**, your provider may be **blocking datacenter/Azure IPs**. Use a **[self-hosted runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/about-self-hosted-runners)** on the VPS so the job runs **on the server** (outbound HTTPS to GitHub only; **no inbound SSH from GitHub**).

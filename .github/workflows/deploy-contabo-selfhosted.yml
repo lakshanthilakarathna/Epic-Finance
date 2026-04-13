@@ -38,8 +38,5 @@ jobs:
             "${GITHUB_WORKSPACE}/" /var/www/epicfinance/
 
       - name: Install, build, restart
-        working-directory: /var/www/epicfinance
         run: |
-          npm ci
-          npm run build
-          sudo systemctl restart epicfinance-nextjs
+          /bin/bash -lc "set -e; cd /var/www/epicfinance && npm ci && npm run build && sudo systemctl restart epicfinance-nextjs"

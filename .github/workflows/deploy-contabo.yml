@@ -95,6 +95,7 @@ jobs:
             -e "ssh -4 -i \"$HOME/.ssh/deploy_key\" -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=30" \
             ./ "${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/"
 
+      # Non-interactive SSH uses a minimal PATH; `bash -lc` loads login profile (NodeSource/nvm in .profile).
       - name: Install, build, restart
         uses: appleboy/ssh-action@v1.2.0
         with:
@@ -106,7 +107,4 @@ jobs:
           command_timeout: 20m
           script_stop: true
           script: |
-            cd ${{ env.DEPLOY_PATH }}
-            npm ci
-            npm run build
-            sudo systemctl restart epicfinance-nextjs
+            /bin/bash -lc "set -e; cd '${{ env.DEPLOY_PATH }}' && npm ci && npm run build && sudo systemctl restart epicfinance-nextjs"

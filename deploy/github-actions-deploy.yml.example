@@ -103,7 +103,4 @@ jobs:
           command_timeout: 20m
           script_stop: true
           script: |
-            cd ${{ env.DEPLOY_PATH }}
-            npm ci
-            npm run build
-            sudo systemctl restart epicfinance-nextjs
+            /bin/bash -lc "set -e; cd '${{ env.DEPLOY_PATH }}' && npm ci && npm run build && sudo systemctl restart epicfinance-nextjs"
