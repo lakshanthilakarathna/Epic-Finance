@@ -9,9 +9,9 @@ const DefaultFooter = () => {
           <div className="row justify-content-between align-items-center">
             <div className="col-xl-4 mil-mb-30">
               <img
-                src="/img/logo/logo-light.webp"
-                width={560}
-                height={560}
+                src="/img/logo/footer%20logo.png"
+                width={6414}
+                height={2825}
                 alt="Epic Finance"
                 className="mil-logo mil-mb-30"
                 style={{ width: 140, height: "auto" }}
